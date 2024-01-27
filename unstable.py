@@ -15,8 +15,8 @@ times = []
 
 
 #Setting up the parameters of the simulation.
-efficiency = 0.99 #Encode the quantum efficiency of the SiPM
-stopping_probability = 0.99 #Probability that the muon will come to a complete rest inside the array
+efficiency = 0.6 #Encode the quantum efficiency of the SiPM
+stopping_probability = 0.1 #Probability that the muon will come to a complete rest inside the array
 muon_lifetime = 2 #Mean lifetime, i.e. time taken for the muon population to decrease by a factor of e
 muon_age = 0 #How long the muon is alive after stopping.
 
@@ -48,7 +48,7 @@ decayed = False
 
 while t < t_max:
     """Main loop- the muon starts at the top of the array and then passes through the scintillators."""
-    detection_status = 0 #Prevents double appen
+    detection_num = 0 #Number of detection events
 
     for i in range (0,3):
         if position[i] >= array_dimension:
@@ -63,13 +63,9 @@ while t < t_max:
         if chance_sipm <= efficiency and in_matrix:
             matrix[x, :, z] += 1
             print("Detection event")
-            if detection_status == 0:
-                detection_array.append(1)
-                detection_status = 1
+            detection_num += 1
         else:
-            if detection_status == 0:
-                detection_array.append(0)
-                detection_status = 1
+            detection_num += 1
         
         if in_matrix:
             chance_stop = np.random.random()
@@ -89,20 +85,10 @@ while t < t_max:
             decayed = True
             print("Muon has decayed")
             matrix[x, :, z] += 1
-            if detection_status == 0:
-                detection_array.append(1)
-                detection_status = 1
-        
-        else:
-            if detection_status == 0:
-                detection_array.append(0)
-                detection_status =1
-    
-    elif detection_status == 0:
-        detection_array.append(0)
-        detection_status = 1
+            detection_num += 1
 
 
+    detection_array.append(detection_num)
     times.append(t)
     t += 1
 
