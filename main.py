@@ -1,7 +1,24 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-#from muon import Muon
+#from muon import Muon- this feature is not ready!
+
+
+"""
+TO DO:
+    Encode the angular distribution of the muons (somehow) and appropriately randomise the incoming velocities
+    Calculate the stopping power of the array and use this to determine whether the muon comes to a stop inside of the
+        array.
+    Figure out what the appropriate units of the simulation are. Then apply this to the simulation
+    Have each muon's velocity randomly generated given the cos^2(theta) dependence of the angular distribution
+
+
+A note on units: we need to be careful with units. So far, the units of t, as well as
+the velocity, are undefined.
+
+For a muon at sea level, expect an energy of 4 GeV. This translates to a beta*gamma of about 38 
+
+"""
 
 #Setting duration of the simulation. The program will run from t=0 to t=tmax
 t = 0

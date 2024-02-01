@@ -7,16 +7,26 @@ class Muon:
 
     def __init__(self, position, velocity):
         self.position = np.array(position)
-        self.velocity = np.arrray(velocity)
+        self.velocity = np.array(velocity)
         self.in_matrix = True 
         self.in_motion = True
         self.decayed = False
 
         #The mean energy of muons at sea level is about 3 GeV. Eventually, I can turn this into a probabilistic distribution.
-        self.momentum = np.random.randint()
+        self.energy = 4 #in GeV
 
-    def stopping_probability(self):
-        """Try and calculate the chance of a muon stopping inside of the scintillating array"""
+    def set_velocity(self):
+        """The probability distribution of muon angles at sea level is proportional to cos^2(theta) where theta is the zenith angle."""
+
+        #Generate 
+        costheta = np.random.random()
+
+    def stopping_probability(self, dx, n_e):
+        """Try and calculate the chance of a muon stopping inside of the scintillating array
+        ARGUMENTS:
+            dx = distance travelled in the array
+            n_e = number density of the material it passes through
+        """
         # if self.in_motion:
         #     #Only calculate the stopping probability of a muon which is in motion
 
