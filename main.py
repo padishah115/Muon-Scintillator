@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+#from muon import Muon
 
 #Setting duration of the simulation. The program will run from t=0 to t=tmax
 t = 0
@@ -24,7 +25,7 @@ times = []
 """
 
 scintillator_detections = {
-    """Stores detection events for each of the 25 scintillators in the array"""
+    #Stores detection events for each of the 25 scintillators in the array
 
     'det1': [],
     'det2': [],
@@ -157,7 +158,8 @@ while t < t_max:
             a = 25
     
     elif z > 4 or x > 4:
-        a = 0 #Not in array at all
+        a = 0 #a is 0 if Not in array at all
+
 
     if in_motion:
         chance_sipm = np.random.random() #Check to see whether SiPM picks up the signal based on efficiency
@@ -199,6 +201,8 @@ while t < t_max:
         
     
     for i in range(len(scintillator_detections)):
+        #Append 0 in any case, and then replace this with 1 if there is a detection. 
+        #Ensures that the dimensions of the scintillator detections arrays are correct.
         scintillator_detections[f'det{i+1}'].append(0)
 
     if detection_status == 1 and a != 0:
