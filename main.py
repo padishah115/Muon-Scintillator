@@ -1,16 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-#from muon import Muon- this feature is not ready!
+from muon import Muon
 
 
 """
 TO DO:
-    Encode the angular distribution of the muons (somehow) and appropriately randomise the incoming velocities
     Calculate the stopping power of the array and use this to determine whether the muon comes to a stop inside of the
         array.
-    Figure out what the appropriate units of the simulation are. Then apply this to the simulation
-    Have each muon's velocity randomly generated given the cos^2(theta) dependence of the angular distribution
+    Have a purple trajectory line follow the muon through the array
 
 
 A note on units: we need to be careful with units. So far, the units of t, as well as
@@ -20,12 +18,14 @@ For a muon at sea level, expect an energy of 4 GeV. This translates to a beta*ga
 
 """
 
-#Setting duration of the simulation. The program will run from t=0 to t=tmax
+#Setting duration of the simulation. The program will run from t=0 to t=tmax. Increments are in the ballpark of about 200ps
 t = 0
 t_max = 20
 
 #Dimensions of the scintillator array- DO NOT CHANGE THIS
 array_dimension = 5
+
+#Properties of the detector. The values here will affect the energy loss of the muon inside of the array
 
 #These are two matrices for plotting "pulse" vs time.
 detection_array = [] #Overall signal master array
@@ -73,36 +73,24 @@ scintillator_detections = {
 }
 
 #Setting up the parameters of the simulation.
-efficiency = 0.99 #Encode the quantum efficiency of the SiPM
+efficiency = 0.99 #Encode the quantum efficiency of the SiPMs
 stopping_probability = 0.1 #Probability that the muon will come to a complete rest inside the array
+
 muon_lifetime = 2 #Mean lifetime, i.e. time taken for the muon population to decrease by a factor of e
+#NB- this should be like 2.2ms, i.e. many, many picoseconds, so the value 2 is not realistic.
+
 muon_age = 0 #How long the muon is alive after stopping.
 
 
-i = np.random.randint(0,array_dimension) #X coordinate
-j = np.random.randint(0,array_dimension) #Y coordinate- call this the depth of the scintillator array. All along the Y axis, we will have it set to 1 when there is a detection event
-k = 0 #Z coordinate. We assume the muon arrives from above, so have it enter from the top of the array.
+muon1 = Muon(array_dimension)
 
-#Initial velocity parameters
-vi = np.random.randint(0,2)
-vj = np.random.randint(0,2)
-vk = 1 #Always will have a downwards velocity
-
-#Position and velocity arrays for the muon as it travels through the scintillating array
-position = np.array([i, j, k])
-velocity = np.array([vi, vj, vk])
 
 #The physical scintillator matrix.
 matrix = np.zeros((array_dimension,array_dimension,array_dimension))
 
 #Initial position of the muon.
-print(position)
-
-
-#Boolean values to help handle different events in the array.
-in_matrix = True
-in_motion = True
-decayed = False
+print(muon1.position)
+print(muon1.velocity)
 
 while t < t_max:
     """Main loop- the muon starts at the top of the array and then passes through the scintillators."""
@@ -110,12 +98,13 @@ while t < t_max:
     a = 0 #Determines which scintillator was triggered
 
     for i in range (0,3):
-        if position[i] >= array_dimension:
-            in_matrix = False
+        #Check to see whether the muon is still inside of the scintillating array
+        if muon1.position[i] >= array_dimension or muon1.position[i] < 0:
+            muon1.in_matrix = False
     
-    x = position[0]
-    y = position[1]
-    z = position[2]
+    x = muon1.position[0]
+    y = muon1.position[1]
+    z = muon1.position[2]
 
     """LABELLING THE SCINTILLATOR WHICH THE MUON IS IN in order to append the detection event to the correct scintillator"""
     if z == 0:
@@ -178,9 +167,9 @@ while t < t_max:
         a = 0 #a is 0 if Not in array at all
 
 
-    if in_motion:
+    if muon1.in_motion:
         chance_sipm = np.random.random() #Check to see whether SiPM picks up the signal based on efficiency
-        if chance_sipm <= efficiency and in_matrix:
+        if chance_sipm <= efficiency and muon1.in_matrix and muon1.in_motion:
             #Check against quantum efficiency
             matrix[x, :, z] += 1
             print("Detection event")
@@ -191,16 +180,18 @@ while t < t_max:
             if detection_status == 0:
                 detection_array.append(0)
         
-        if in_matrix:
+        if muon1.in_matrix:
             #Check to see whether the muon stops inside of the array
             chance_stop = np.random.random()
             if chance_stop <= stopping_probability:
-                velocity = np.array([0,0,0])
-                in_motion = False
+                muon1.velocity = np.array([0,0,0])
+                muon1.in_motion = False
+                print("Muon has stopped inside of the array.")
 
-        position = np.add(position, velocity)
+        muon1.position = np.add(muon1.position, muon1.velocity)
+        muon1.position = np.rint(muon1.position).astype(int)
 
-    if not in_motion and not decayed and in_matrix:
+    elif not muon1.in_motion and not muon1.decayed and muon1.in_matrix:
         #Check to see whether the muon, having stopped in the array, decays
         muon_age += 1
         exponent = np.exp(-muon_age/muon_lifetime)
@@ -209,7 +200,7 @@ while t < t_max:
 
         if chance_decay >= exponent:
             #Check against a random variable to see whether decay has occurred
-            decayed = True
+            muon1.decayed = True
             print("Muon has decayed")
             matrix[x, :, z] += 1
             if detection_status == 0:
@@ -229,7 +220,7 @@ while t < t_max:
     t += 1
 
     #Sanity-check output on the console
-    print(position)
+    print(muon1.position)
     print(f"Time is {t}")
 
 

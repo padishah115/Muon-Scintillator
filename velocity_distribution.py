@@ -29,6 +29,10 @@ def generate_velocity(v):
     """Generate a velocity given a value of zenith angle and velocity
         Requires you to pass the absolute magnitude of the velocity, which is given by 
         the muon momentum
+
+        returns velocity and theta
+
+        We need the returned velocity matrix to contain only integer values...
     """
 
     theta = generate_theta()
