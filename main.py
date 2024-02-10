@@ -38,7 +38,7 @@ for x in range(sim_num):
     a = run_simulation_and_return_age(copper_stopping_power, copper_rho, t_max, array_dimension, efficiency)
     ages.append(a) #a = 0 implies that the muon never stopped inside the array
 
-print(ages) #Currently this seems a little high
+print(ages)
 print(f"{percentage_stopped(ages)} % of muons stopped in the array") # prints the percentage of muons which were stopped in the array
 graph_ages(ages)
 
