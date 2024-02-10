@@ -28,6 +28,9 @@ class Muon:
         self.in_motion = True #Is the muon in motion?
         self.decayed = False #Has the muon decayed?
 
+        self.distance_travelled_in_array = 0
+        self.energy = 4000 #Energy in MeV
+
 
     def generate_position(self):
         #Generates the initial position of the muon given the velocity.
