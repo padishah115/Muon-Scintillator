@@ -10,15 +10,9 @@ class Muon:
     def __init__(self, array_dim):
         self.array_dimension = array_dim
         
-        #self.energy = generate_energy() #Generate the muon energy given our information about the cosmic ray spectrum
-        #self.v = v_from_energy(self.energy) #Absolute magnitude of velocity
-
-
         #Mean muon energy is 4GeV, meaning v is about c
         #Set c = 1
         self.velocity = np.array(generate_velocity(1)) #Returns velocity array
-        
-
         self.position = np.array(self.generate_position())
 
         
@@ -28,8 +22,11 @@ class Muon:
         self.in_motion = True #Is the muon in motion?
         self.decayed = False #Has the muon decayed?
 
-        self.distance_travelled_in_array = 0
+        self.distance_travelled_in_array = 1
         self.energy = 4000 #Energy in MeV
+
+        self.lifetime = 2.2
+        self.age = 0
 
 
     def generate_position(self):
@@ -84,18 +81,3 @@ class Muon:
         
 
         return np.array([i,j,k])
-
-    def stopping_probability(self, dx, n_e, Z, A):
-        """Try and calculate the chance of a muon stopping inside of the scintillating array
-        ARGUMENTS:
-            dx = distance travelled in the array
-            n_e = number density of the material it passes through
-        """
-        # if self.in_motion:
-        #     #Only calculate the stopping probability of a muon which is in motion
-
-
-        # else:
-        #     pass 
-
-        return 0

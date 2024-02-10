@@ -19,7 +19,7 @@ def generate_theta():
         c2 = (np.cos(theta_random))**2
         chance = np.random.random()
         
-        if chance < c2 and theta_random < 60/180 * np.pi: #reject anything above 60 degrees
+        if chance < c2 and theta_random < 60/180 * np.pi: #reject anything above 60 degrees, as this is not realistic
             theta = theta_random
             ready = True #we are ready to exit
 
