@@ -23,14 +23,23 @@ def graph_ages(ages):
     for x in range(0, max_lifetime+1):
         values.append(x)
 
-    freq = np.zeros_like(values) #Frequency of each value of lifetime
+    frequencies = np.zeros_like(values) #Frequency of each value of lifetime
 
     for x in lifetimes:
-        freq[x] += 1
+        frequencies[x] += 1
 
-    freq[0] = len(lifetimes)
+    frequencies[0] = len(lifetimes)
 
-    plt.scatter(values, freq)
+    p = np.polyfit(values, np.log(frequencies), 1)
+
+    best_fit_freq = []
+
+    for value in values:
+        i = np.exp(p[1] + p[0]*value)
+        best_fit_freq.append(i)
+
+    plt.scatter(values, frequencies)
+    plt.plot(values, best_fit_freq)
     plt.title('Population graph of muons in array after each time')
     plt.xlabel('Lifetime of muons in array')
     plt.ylabel('Frequency of lifetime')
