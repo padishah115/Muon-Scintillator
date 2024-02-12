@@ -169,7 +169,7 @@ def run_simulation_and_plot(stppw, rho, t_max, array_dimension, efficiency):
     #3D Bar graph which graphically displays detection events
     plt.ylabel('Horizonal axis (i)')
     plt.xlabel('Height (k)')
-    plt.title('0 is max height, 4 is bottom of array')
+    plt.title('0 is max height, 5 is bottom of array')
     ax.set_xlim(0,array_dimension)
     ax.set_ylim(0,array_dimension)
     ax.set_zlim(0,2)
