@@ -43,6 +43,7 @@ def graph_ages(ages):
     plt.title('Population graph of muons in array after each time')
     plt.xlabel('Lifetime of muons in array')
     plt.ylabel('Frequency of lifetime')
+    plt.savefig('Muon_Pop_v_time.png')
     plt.show()
 
     
