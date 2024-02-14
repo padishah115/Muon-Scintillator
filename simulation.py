@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from muon import Muon
 from array_stopping_power import *
+from bethe_equation import *
+
+
+"""Make sure that the simulation and run sim/plot methods are actually doing the same thing"""
 
 def run_simulation_and_plot(stppw, rho, t_max, array_dimension, efficiency):
 
@@ -202,10 +206,9 @@ def run_simulation_and_plot(stppw, rho, t_max, array_dimension, efficiency):
     plt.savefig('pulse graphs')
     plt.show()
 
-
-
-def run_simulation_and_return_age(stppw, rho, t_max, array_dimension, efficiency):
-    """Removes all graphical displays or printed values"""
+def run_simulation_and_return_age(t_max, array_dimension, efficiency, rho, a_no, m_no, exc_energy): 
+    """Removes all graphical displays or printed values. Takes as arguments: t_max of simulation, dimension for the square array, atomic number of the material,
+    average excitation energy, W_max as max transfer of energy in collision"""
 
     t = 0 #Initialise time
 
@@ -302,16 +305,23 @@ def run_simulation_and_return_age(stppw, rho, t_max, array_dimension, efficiency
                     detection_array.append(0)
             
             if muon1.in_matrix:
-                #Check to see whether the muon stops inside of the array
-                if check_stop(muon1.energy, stppw, rho, muon1.distance_travelled_in_array):
-                    muon1.velocity = np.array([0,0,0])
-                    muon1.in_motion = False
-                    #print("Muon has stopped inside of the array.")
+                #Stoppping power calculation
+
+                de = abs(rho * bethe_equation(a_no, m_no, muon1.gamma, exc_energy) * 5) #5 cm steps from scintillator to scintillator 
+                muon1.energy -= de #Reduces the energy of the muon in line with the Bethe equation
+                #print(muon1.energy)
+                muon1.update_gamma()
+                #muon1.update_velocity()
+
+                # if check_stop(muon1.energy, stppw, rho, muon1.distance_travelled_in_array):
+                #     muon1.velocity = np.array([0,0,0])
+                #     muon1.in_motion = False
+                #     #print("Muon has stopped inside of the array.")
 
             muon1.position = np.add(muon1.position, muon1.velocity)
             muon1.position = np.rint(muon1.position).astype(int)
-            if not muon1.velocity.all(0) and muon1.in_matrix:
-                muon1.distance_travelled_in_array += 1
+            # if not muon1.velocity.all(0) and muon1.in_matrix:
+            #     muon1.distance_travelled_in_array += 1
 
 
         elif not muon1.in_motion and not muon1.decayed and muon1.in_matrix:
@@ -330,6 +340,9 @@ def run_simulation_and_return_age(stppw, rho, t_max, array_dimension, efficiency
                     detection_array.append(1)
                     detection_status = 1
             
+        if muon1.energy <= 0:
+            #If energy falls to 0 then the muon cannot be in motion
+            muon1.in_motion = False
         
         for i in range(len(scintillator_detections)):
             #Append 0 in any case, and then replace this with 1 if there is a detection. 

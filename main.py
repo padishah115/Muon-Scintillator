@@ -18,8 +18,10 @@ For a muon at sea level, expect an energy of 4 GeV. This translates to a beta*ga
 """
 
 #Properties of the copper array
-copper_stopping_power = 1.5 #MeV cm^2/g
 copper_rho = 8.96 #Density in g/cm^3
+copper_atomic_number = 29
+copper_atomic_mass = 63.5
+excitation_energy = 3 #In eV, based on light of wavelength 425nm
 
 #Quantum efficiency of SiPM
 efficiency = 0.8
@@ -27,7 +29,7 @@ efficiency = 0.8
 #Setting duration of the simulation. The program will run from t=0 to t=tmax. Increments are in the ballpark of about 200ps
 t = 0
 t_max = 20
-sim_num = 5000
+sim_num = 500
 
 #Dimensions of the scintillator array- DO NOT CHANGE THIS
 array_dimension = 5
@@ -35,7 +37,7 @@ array_dimension = 5
 ages = []
 
 for x in range(sim_num):
-    a = run_simulation_and_return_age(copper_stopping_power, copper_rho, t_max, array_dimension, efficiency)
+    a = run_simulation_and_return_age(t_max, array_dimension, efficiency, copper_rho, copper_atomic_number, copper_atomic_mass, excitation_energy)
     ages.append(a) #a = 0 implies that the muon never stopped inside the array
 
 print(ages)
@@ -43,7 +45,7 @@ print(f"{percentage_stopped(ages):.2f} % of muons stopped in the array") # print
 graph_ages(ages)
 
 #Nice to have a graph
-run_simulation_and_plot(copper_stopping_power, copper_rho, t_max, array_dimension, efficiency)
+# run_simulation_and_plot(copper_stopping_power, copper_rho, t_max, array_dimension, efficiency)
 
 
 

@@ -1,10 +1,5 @@
 import numpy as np
 
-"""
-Allows us to initialise different arrays using the array class/object
-Assume a mass stopping power near the broad minimum (seems reasonable)
-Say that stopping power is therefore around 1.5MeV
-"""
 
 def check_stop(energy, stppow, rho, distance_travelled_in_array):
     """Pass the muon energy, stopping power in MeV and density in grams cm-3"""
