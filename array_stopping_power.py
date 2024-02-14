@@ -21,3 +21,5 @@ def check_stop(energy, stppow, rho, distance_travelled_in_array):
         return True
     else:
         return False
+    
+

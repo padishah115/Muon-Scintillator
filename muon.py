@@ -25,6 +25,8 @@ class Muon:
         self.distance_travelled_in_array = 1 #At beginning of simulation, all muons have already entered the array and hence travelled 1 block
         self.energy = self.generate_energy() #Energy in MeV
 
+        self.gamma = self.get_gamma()
+
         self.lifetime = 2.2
         self.age = 0
 
@@ -111,3 +113,11 @@ class Muon:
                 ready = True
 
         return energy
+
+def get_gamma(self):
+    e = self.energy #Energy in MeV
+    m = 206 * 0.511 #Mass in MeV
+    gamma = e / m
+
+    return gamma
+
