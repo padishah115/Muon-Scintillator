@@ -1,7 +1,7 @@
 import numpy as np
 
 """This module holds the functions which generate the velocity of the muons based on the cos^2 distribution
-Currently I am forbidding any values of theta which are not at least greater than 45 degrees
+Currently I am forbidding any values of theta beyond 60
 """
 
 
@@ -19,7 +19,7 @@ def generate_theta():
         c2 = (np.cos(theta_random))**2
         chance = np.random.random()
         
-        if chance < c2 and theta_random < 60/180 * np.pi: #reject anything above 60 degrees, as this is not realistic
+        if chance < c2 and theta_random < 45/180 * np.pi: #reject anything above 45 degrees, as this is when cos^2 drops to 1/4
             theta = theta_random
             ready = True #we are ready to exit
 

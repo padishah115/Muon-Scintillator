@@ -39,7 +39,7 @@ for x in range(sim_num):
     ages.append(a) #a = 0 implies that the muon never stopped inside the array
 
 print(ages)
-print(f"{percentage_stopped(ages)} % of muons stopped in the array") # prints the percentage of muons which were stopped in the array
+print(f"{percentage_stopped(ages):.2f} % of muons stopped in the array") # prints the percentage of muons which were stopped in the array
 graph_ages(ages)
 
 #Nice to have a graph

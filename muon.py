@@ -12,7 +12,7 @@ class Muon:
         
         #Mean muon energy is 4GeV, meaning v is about c
         #Set c = 1
-        self.velocity = np.array(generate_velocity(1)) #Returns velocity array
+        self.velocity = generate_velocity(1) #Returns velocity array 
         self.position = np.array(self.generate_position())
 
         
@@ -22,15 +22,15 @@ class Muon:
         self.in_motion = True #Is the muon in motion?
         self.decayed = False #Has the muon decayed?
 
-        self.distance_travelled_in_array = 1
-        self.energy = 4000 #Energy in MeV
+        self.distance_travelled_in_array = 1 #At beginning of simulation, all muons have already entered the array and hence travelled 1 block
+        self.energy = self.generate_energy() #Energy in MeV
 
         self.lifetime = 2.2
         self.age = 0
 
 
     def generate_position(self):
-        #Generates the initial position of the muon given the velocity.
+        """Generates the initial position of the muon given the velocity."""
         
         if self.velocity[0] > 0 and self.velocity[1] > 0:
             i = 0
@@ -81,3 +81,33 @@ class Muon:
         
 
         return np.array([i,j,k])
+    
+
+    def generate_energy(self):
+        """Generates a random energy between 1 and 10 Gev in steps of 1, using the paper
+        https://arxiv.org/pdf/1606.06907.pdf"""
+
+        energy = 4000 #default value is 4000 MeV
+
+        energies = np.arange(1,11) #Energies between 1 and 10 GeV
+        energies_mev = np.multiply(energies, 1000) #Convert to MeV
+
+        normalisation_factor = 0
+
+        for e in energies_mev:
+            #Calculate the normalisation factor by summing over energies in the range
+            normalisation_factor += ((4290 + e)**-3.01) * (1 + e/854)**-1
+
+        ready = False
+
+        while not ready:
+
+            chance = np.random.random()
+            energy_choice = np.random.choice(energies_mev) #try random energy from the MeV matrix
+            energy_probability = (1/normalisation_factor) *  (((4290 + energy_choice)**-3.01) * (1 + energy_choice/854)**-1) #Calculate probability
+
+            if chance <= energy_probability: #Accept reject
+                energy = energy_choice
+                ready = True
+
+        return energy
