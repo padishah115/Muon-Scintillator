@@ -120,13 +120,16 @@ class Muon:
         return gamma
 
     def update_gamma(self):
-        if self.energy > 0:
+        if self.energy > 105:
             e = self.energy #Energy in MeV
             m = 206 * 0.511 # Muon Mass in MeV
             gamma = e / m
         
-        elif self.energy <= 0:
-            gamma = 0
+        elif self.energy <= 105:
+            #Ensure that gamma never less than 1
+            #Make the muon stationary
+            self.velocity = np.array([0,0,0])
+            gamma = 1
 
         self.gamma = gamma
 
