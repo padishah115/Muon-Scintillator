@@ -143,8 +143,11 @@ def run_simulation_and_plot(t_max, array_dimension, efficiency, rho, a_no, m_no,
                 if detection_status == 0:
                     detection_array.append(1)
                     detection_status = 1
-            
         
+        if muon1.energy <= muon1.mass:
+            #If energy falls to rest mass then the muon cannot be in motion
+            muon1.in_motion = False
+            
         for i in range(len(scintillator_detections)):
             #Append 0 in any case, and then replace this with 1 if there is a detection. 
             #Ensures that the dimensions of the scintillator detections arrays are correct.
@@ -217,6 +220,9 @@ def run_simulation_and_plot(t_max, array_dimension, efficiency, rho, a_no, m_no,
     plt.tight_layout()
     plt.savefig('pulse graphs')
     plt.show()
+
+
+
 
 def run_simulation_and_return_age(t_max, array_dimension, efficiency, rho, a_no, m_no, exc_energy): 
     """Removes all graphical displays or printed values. Takes as arguments: t_max of simulation, dimension for the square array, atomic number of the material,
@@ -338,6 +344,8 @@ def run_simulation_and_return_age(t_max, array_dimension, efficiency, rho, a_no,
 
         elif not muon1.in_motion and not muon1.decayed and muon1.in_matrix:
             #Check to see whether the muon, having stopped in the array, decays
+
+            #Muon.age = 0 the first time this is calculated
             decay_probability = 1 - np.exp(-muon1.age/muon1.lifetime)
             muon1.age += 1 #Lifetime after stopping
 
@@ -352,8 +360,8 @@ def run_simulation_and_return_age(t_max, array_dimension, efficiency, rho, a_no,
                     detection_array.append(1)
                     detection_status = 1
             
-        if muon1.energy <= 0:
-            #If energy falls to 0 then the muon cannot be in motion
+        if muon1.energy <= muon1.mass:
+            #If energy falls to rest mass then the muon cannot be in motion
             muon1.in_motion = False
         
         for i in range(len(scintillator_detections)):

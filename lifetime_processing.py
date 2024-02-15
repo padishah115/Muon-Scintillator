@@ -10,40 +10,52 @@ def percentage_stopped(ages):
     percentage = stopped / number * 100
     return percentage
 
-def graph_ages(ages):
-    lifetimes = []
-    values = [] #Lifetime values
+def number_stopped(ages):
+    stopped = 0
+    for x in ages:
+        if x != 0:
+            stopped += 1
+    
+    return stopped
 
+def graph_ages(ages):
+    lifetimes = [] #Collects all muons which have self.age != 1, i.e. decayed inside the matrix
+    values = [] #Time spent stationary in matrix
+    
     for x in ages:
         if x != 0: 
             lifetimes.append(x)
 
-    max_lifetime = np.max(lifetimes)
+    if len(lifetimes) > 0:
 
-    for x in range(0, max_lifetime+1):
-        values.append(x)
+        initial_population = len(lifetimes) #Initial number of muons which are stationary, i.e. population at t=0
+        max_lifetime = np.max(lifetimes) #Maximum age of muons in the array
 
-    frequencies = np.zeros_like(values) #Frequency of each value of lifetime
+        values = np.arange(0, max_lifetime+1) #Values of lifetimes
+        frequencies = np.zeros_like(values) #Number of muons at each lifetime
 
-    for x in lifetimes:
-        frequencies[x] += 1
+        
+        frequencies[0] = 0 #Zero muons decay after 0 time
 
-    frequencies[0] = len(lifetimes) #Length of lifetimes array is the number of muons which have been stopped inside of the array
+        for time in lifetimes:
+            frequencies[time] += 1
 
-    #p = np.polyfit(values, np.log(frequencies), 1)
 
-    #best_fit_freq = []
+        decayed = np.cumsum(frequencies) #Cumulative sum of how many have decayed using the ages matrix
+        remaining_muons = np.zeros_like(frequencies)
 
-    # for value in values:
-    #     i = np.exp(p[1] + p[0]*value)
-    #     best_fit_freq.append(i)
+        for i in range (len(decayed)):
+            remaining_muons[i] = initial_population - decayed[i]
 
-    plt.scatter(values, frequencies)
-    #plt.plot(values, best_fit_freq)
-    plt.title('Population graph of muons in array after each time')
-    plt.xlabel('Lifetime of muons in array')
-    plt.ylabel('Frequency of lifetime')
-    plt.savefig('Muon_Pop_v_time.png')
-    plt.show()
+
+        plt.scatter(values, remaining_muons)
+        plt.title('Population graph of muons in array after each time')
+        plt.xlabel('Lifetime of muons in array')
+        plt.ylabel('Muon Population')
+        plt.savefig('Muon_Pop_v_time.png')
+        plt.show()
+
+    else:
+        print("No muons decayed in simulation")
 
     

@@ -29,7 +29,7 @@ efficiency = 0.8
 #Setting duration of the simulation. The program will run from t=0 to t=tmax. Increments are in the ballpark of about 200ps
 t = 0
 t_max = 20
-sim_num = 500
+sim_num = 1000
 
 #Dimensions of the scintillator array- DO NOT CHANGE THIS
 array_dimension = 5
@@ -41,6 +41,7 @@ for x in range(sim_num):
     ages.append(a) #a = 0 implies that the muon never stopped inside the array
 
 print(ages)
+print(f"{number_stopped(ages)} stopped in total")
 print(f"{percentage_stopped(ages):.2f} % of muons stopped in the array") # prints the percentage of muons which were stopped in the array
 graph_ages(ages)
 
