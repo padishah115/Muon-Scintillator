@@ -45,7 +45,7 @@ print(f"{percentage_stopped(ages):.2f} % of muons stopped in the array") # print
 graph_ages(ages)
 
 #Nice to have a graph
-# run_simulation_and_plot(copper_stopping_power, copper_rho, t_max, array_dimension, efficiency)
+#run_simulation_and_plot(t_max, array_dimension, efficiency, copper_rho, copper_atomic_number, copper_atomic_mass, excitation_energy)
 
 
 

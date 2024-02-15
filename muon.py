@@ -7,13 +7,19 @@ class Muon:
 
     def __init__(self, array_dim):
         self.array_dimension = array_dim
+        self.mass = 206 * 0.511 #Muon mass in MeV
+        self.max_angle_deg = 45 #Maximal zenith angle of the muons in units of degrees
+
+        #First, generate energy using distribution. Use this to generate gamma. This, in turn, can be used to compute the velocity in natural units
+        self.energy = self.generate_energy() #Energy in MeV
+        self.gamma = self.get_gamma()
         
         #Mean muon energy is 4GeV, meaning v is about c
         #Set c = 1
         self.velocity = self.generate_velocity(1) #Returns velocity array 
         self.position = self.generate_position()
 
-        self.mass = 206 * 0.511 #Muon mass in MeV
+        
 
         #Start the simulation with the muon inside of the matrix at t = 0, not decayed, and in motion.
         self.in_matrix = True #Is the muon still inside of the scintillating array?
@@ -21,11 +27,8 @@ class Muon:
         self.decayed = False #Has the muon decayed?
 
         self.distance_travelled_in_array = 1 #At beginning of simulation, all muons have already entered the array and hence travelled 1 block
-        self.energy = self.generate_energy() #Energy in MeV
 
-        self.gamma = self.get_gamma()
-
-        self.lifetime = 2.2
+        self.lifetime = 2.2 #Characteristic decay time
         self.age = 0
 
 
@@ -114,18 +117,18 @@ class Muon:
     def get_gamma(self):
         
         e = self.energy #Energy in MeV
-        m = 206 * 0.511 #Muon Mass in MeV
+        m = self.mass #Muon Mass in MeV
         gamma = e / m
 
         return gamma
 
     def update_gamma(self):
-        if self.energy > 105:
+        if self.energy > self.mass:
             e = self.energy #Energy in MeV
-            m = 206 * 0.511 # Muon Mass in MeV
+            m = self.mass # Muon Mass in MeV
             gamma = e / m
         
-        elif self.energy <= 105:
+        elif self.energy <= self.mass:
             #Ensure that gamma never less than 1
             #Make the muon stationary
             self.velocity = np.array([0,0,0])
@@ -150,7 +153,7 @@ class Muon:
             c2 = (np.cos(theta_random))**2
             chance = np.random.random()
             
-            if chance < c2 and theta_random < 45/180 * np.pi: #reject anything above 45 degrees, as this is when cos^2 drops to 1/4
+            if chance < c2 and theta_random < self.max_angle_deg/180 * np.pi: #reject anything above 45 degrees, as this is when cos^2 drops to 1/4
                 theta = theta_random
                 ready = True #we are ready to exit
 
@@ -179,4 +182,23 @@ class Muon:
 
         velocity = np.array([v_x, v_y, v_z])
 
+        gamma = self.gamma
+        beta = beta = np.sqrt(1-1/gamma**2)
+
+        #c=1 so use beta to find overall value of velocity
+        velocity = np.multiply(velocity, beta)
+
         return velocity
+
+    def update_velocity(self):
+        gamma = self.gamma
+        beta = np.sqrt(1-1/gamma**2)
+
+        #Velocity init
+        self.velocity = np.multiply(self.velocity, beta)
+
+    def get_beta(self):
+        gamma = self.gamma
+        beta = np.sqrt(1 - 1/gamma**2)
+
+        return beta

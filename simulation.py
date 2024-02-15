@@ -8,7 +8,7 @@ from bethe_equation import *
 
 """Make sure that the simulation and run sim/plot methods are actually doing the same thing"""
 
-def run_simulation_and_plot(stppw, rho, t_max, array_dimension, efficiency):
+def run_simulation_and_plot(t_max, array_dimension, efficiency, rho, a_no, m_no, exc_energy):
 
     t = 0 #Initialise time
 
@@ -104,11 +104,23 @@ def run_simulation_and_plot(stppw, rho, t_max, array_dimension, efficiency):
                     detection_array.append(0)
             
             if muon1.in_matrix:
-                #Check to see whether the muon stops inside of the array
-                if check_stop(muon1.energy, stppw, rho, muon1.distance_travelled_in_array):
-                    muon1.velocity = np.array([0,0,0])
-                    muon1.in_motion = False
-                    print("Muon has stopped inside of the array.")
+                #Stoppping power calculation
+
+                de = abs(rho * bethe_equation(a_no, m_no, muon1.gamma, muon1.get_beta(), muon1.mass, exc_energy) * 5) #5 cm steps from scintillator to scintillator 
+                muon1.energy -= de #Reduces the energy of the muon in line with the Bethe equation
+                #print(muon1.energy)
+                muon1.update_gamma() #Update gamma given the new energy
+                muon1.update_velocity() #Update the velocity given the new gamma!
+
+                # if check_stop(muon1.energy, stppw, rho, muon1.distance_travelled_in_array):
+                #     muon1.velocity = np.array([0,0,0])
+                #     muon1.in_motion = False
+                #     #print("Muon has stopped inside of the array.")
+
+            muon1.position = np.add(muon1.position, muon1.velocity)
+            muon1.position = np.rint(muon1.position).astype(int)
+            # if not muon1.velocity.all(0) and muon1.in_matrix:
+            #     muon1.distance_travelled_in_array += 1
 
             muon1.position = np.add(muon1.position, muon1.velocity)
             muon1.position = np.rint(muon1.position).astype(int)
@@ -118,15 +130,15 @@ def run_simulation_and_plot(stppw, rho, t_max, array_dimension, efficiency):
 
         elif not muon1.in_motion and not muon1.decayed and muon1.in_matrix:
             #Check to see whether the muon, having stopped in the array, decays
+            decay_probability = 1 - np.exp(-muon1.age/muon1.lifetime)
             muon1.age += 1 #Lifetime after stopping
-            exponent = np.exp(-muon1.age/muon1.lifetime)
 
             chance_decay = np.random.random()
 
-            if chance_decay >= exponent:
+            if chance_decay < decay_probability:
                 #Check against a random variable to see whether decay has occurred
                 muon1.decayed = True
-                print("Muon has decayed")
+                #print("Muon has decayed")
                 matrix[x, :, z] += 1
                 if detection_status == 0:
                     detection_array.append(1)
@@ -307,11 +319,11 @@ def run_simulation_and_return_age(t_max, array_dimension, efficiency, rho, a_no,
             if muon1.in_matrix:
                 #Stoppping power calculation
 
-                de = abs(rho * bethe_equation(a_no, m_no, muon1.gamma, exc_energy) * 5) #5 cm steps from scintillator to scintillator 
+                de = abs(rho * bethe_equation(a_no, m_no, muon1.gamma, muon1.get_beta(), muon1.mass, exc_energy) * 5) #5 cm steps from scintillator to scintillator 
                 muon1.energy -= de #Reduces the energy of the muon in line with the Bethe equation
                 #print(muon1.energy)
-                muon1.update_gamma()
-                #muon1.update_velocity()
+                muon1.update_gamma() #Update gamma given the new energy
+                muon1.update_velocity() #Update the velocity given the new gamma!
 
                 # if check_stop(muon1.energy, stppw, rho, muon1.distance_travelled_in_array):
                 #     muon1.velocity = np.array([0,0,0])
@@ -326,12 +338,12 @@ def run_simulation_and_return_age(t_max, array_dimension, efficiency, rho, a_no,
 
         elif not muon1.in_motion and not muon1.decayed and muon1.in_matrix:
             #Check to see whether the muon, having stopped in the array, decays
+            decay_probability = 1 - np.exp(-muon1.age/muon1.lifetime)
             muon1.age += 1 #Lifetime after stopping
-            exponent = np.exp(-muon1.age/muon1.lifetime)
 
             chance_decay = np.random.random()
 
-            if chance_decay >= exponent:
+            if chance_decay < decay_probability:
                 #Check against a random variable to see whether decay has occurred
                 muon1.decayed = True
                 #print("Muon has decayed")

@@ -11,3 +11,7 @@ res, err = quad(f, -2, 2)
 print("The numerical result is {:f} (+-{:g})"
     .format(res, err))
 
+def return1():
+    return 1
+
+print(return1())

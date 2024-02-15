@@ -28,18 +28,18 @@ def graph_ages(ages):
     for x in lifetimes:
         frequencies[x] += 1
 
-    frequencies[0] = len(lifetimes)
+    frequencies[0] = len(lifetimes) #Length of lifetimes array is the number of muons which have been stopped inside of the array
 
-    p = np.polyfit(values, np.log(frequencies), 1)
+    #p = np.polyfit(values, np.log(frequencies), 1)
 
-    best_fit_freq = []
+    #best_fit_freq = []
 
-    for value in values:
-        i = np.exp(p[1] + p[0]*value)
-        best_fit_freq.append(i)
+    # for value in values:
+    #     i = np.exp(p[1] + p[0]*value)
+    #     best_fit_freq.append(i)
 
     plt.scatter(values, frequencies)
-    plt.plot(values, best_fit_freq)
+    #plt.plot(values, best_fit_freq)
     plt.title('Population graph of muons in array after each time')
     plt.xlabel('Lifetime of muons in array')
     plt.ylabel('Frequency of lifetime')
