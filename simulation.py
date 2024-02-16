@@ -117,10 +117,6 @@ def run_simulation_and_plot(t_max, array_dimension, efficiency, rho, a_no, m_no,
                 #     muon1.in_motion = False
                 #     #print("Muon has stopped inside of the array.")
 
-            muon1.position = np.add(muon1.position, muon1.velocity)
-            muon1.position = np.rint(muon1.position).astype(int)
-            # if not muon1.velocity.all(0) and muon1.in_matrix:
-            #     muon1.distance_travelled_in_array += 1
 
             muon1.position = np.add(muon1.position, muon1.velocity)
             muon1.position = np.rint(muon1.position).astype(int)

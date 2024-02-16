@@ -22,8 +22,8 @@ class Muon:
         
 
         #Start the simulation with the muon inside of the matrix at t = 0, not decayed, and in motion.
-        self.in_matrix = True #Is the muon still inside of the scintillating array?
-        self.in_motion = True #Is the muon in motion?
+        #self.in_matrix = True #Is the muon still inside of the scintillating array?
+        #self.in_motion = True #Is the muon in motion?
         self.decayed = False #Has the muon decayed?
 
         self.distance_travelled_in_array = 1 #At beginning of simulation, all muons have already entered the array and hence travelled 1 block
@@ -123,6 +123,7 @@ class Muon:
         return gamma
 
     def update_gamma(self):
+        """Updates value of gamma based on energy loss"""
         if self.energy > self.mass:
             e = self.energy #Energy in MeV
             m = self.mass # Muon Mass in MeV
@@ -136,8 +137,6 @@ class Muon:
 
         self.gamma = gamma
 
-    # def update_velocity(self):
-    #     return 0
 
     def generate_theta(self):
         """The muon cosmic ray spectrum is proportional to cos^2(theta)
@@ -190,15 +189,41 @@ class Muon:
 
         return velocity
 
+
     def update_velocity(self):
+        """Updates velocity based on updated values of gamma"""
         gamma = self.gamma
         beta = np.sqrt(1-1/gamma**2)
 
         #Velocity init
         self.velocity = np.multiply(self.velocity, beta)
 
+
     def get_beta(self):
+        """Returns absolute magnitude of velocity as a fraction of c"""
         gamma = self.gamma
         beta = np.sqrt(1 - 1/gamma**2)
 
         return beta
+    
+
+    def update_position(self):
+        """Updates the position of the particle"""
+        self.position = np.rint(np.add(self.position, self.velocity)).astype(int)
+
+
+    def is_contained(self):
+        """Checks to see whether the muon is contained within the array matrix"""
+        for i in range (0,3):
+        #Check to see whether the muon is still inside of the scintillating array
+            if self.position[i] >= self.array_dimension or self.position[i] < 0:
+                return False
+            else:
+                return True
+
+    def is_in_motion(self):
+        """Checks to see whether the muon is still in motion"""
+        if not any(self.velocity):
+            return False
+        else:
+            return True

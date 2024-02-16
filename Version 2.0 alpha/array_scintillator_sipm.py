@@ -109,4 +109,11 @@ class SIPM:
         eff = np.random.normal(x_bar, sigma_eff)
 
         return eff
-
+    
+    def caught_light(self):
+        """Checks to see whether the SiPM catches the light of the scintillator."""
+        chance = np.random.random()
+        if chance <= self.efficiency:
+             return True
+        else:
+             return False
