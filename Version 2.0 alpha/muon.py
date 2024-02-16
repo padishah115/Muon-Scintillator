@@ -123,7 +123,7 @@ class Muon:
         return gamma
 
     def update_gamma(self):
-        """Updates value of gamma based on energy loss"""
+        """Updates value of gamma based on energy loss. ALWAYS CALL THIS BEFORE UPDATING VELOCITY"""
         if self.energy > self.mass:
             e = self.energy #Energy in MeV
             m = self.mass # Muon Mass in MeV
@@ -191,7 +191,7 @@ class Muon:
 
 
     def update_velocity(self):
-        """Updates velocity based on updated values of gamma"""
+        """Updates velocity based on updated values of gamma. ALWAYS CALL THIS AFTER UPDATE_GAMMA"""
         gamma = self.gamma
         beta = np.sqrt(1-1/gamma**2)
 
@@ -218,12 +218,21 @@ class Muon:
         #Check to see whether the muon is still inside of the scintillating array
             if self.position[i] >= self.array_dimension or self.position[i] < 0:
                 return False
-            else:
-                return True
+        return True
 
     def is_in_motion(self):
         """Checks to see whether the muon is still in motion"""
-        if not any(self.velocity):
+        if any(self.velocity):
+            return True
+        else:
+            return False
+        
+    def decays(self):
+        """Check to see whether the muon decays given its age"""
+        chance = np.random.random()
+        exp = np.exp(-self.age / self.lifetime)
+
+        if chance < exp:
             return False
         else:
             return True
