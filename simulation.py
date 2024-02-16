@@ -250,7 +250,7 @@ def run_simulation_and_return_age(t_max, array_dimension, efficiency, rho, a_no,
         'det1': [],
         'det2': [],
         'det3': [],
-        'det4':[],
+        'det4': [],
         'det5': [],
         'det6': [],
         'det7': [],
@@ -298,7 +298,7 @@ def run_simulation_and_return_age(t_max, array_dimension, efficiency, rho, a_no,
                 muon1.in_matrix = False
         
         x = muon1.position[0]
-        y = muon1.position[1]#Scintillator bar axis
+        y = muon1.position[1] #Scintillator bar axis
         z = muon1.position[2]
 
         """LABELLING THE SCINTILLATOR WHICH THE MUON IS IN in order to append the detection event to the correct scintillator"""
@@ -370,6 +370,7 @@ def run_simulation_and_return_age(t_max, array_dimension, efficiency, rho, a_no,
             scintillator_detections[f'det{i+1}'].append(0)
 
         if detection_status == 1 and a != 0:
+            #Check to see whether there was a detection, and if so, append to the relevant detector "det" list at the most recent position
             scintillator_detections[f'det{a}'][-1] = 1
 
         times.append(t)

@@ -1,3 +1,15 @@
-values = range(0,5)
+import numpy as np
 
-print(values)
+matrix = np.zeros((5,1))
+matrix[1] = 1
+
+matrix2 = np.array([0,0,0])
+
+x = np.random.normal(3,1)
+
+if any(matrix):
+    print('yes')
+else:
+    print('no')
+
+#print(matrix)
