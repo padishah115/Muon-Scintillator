@@ -1,3 +1,0 @@
-To do:
-Look for appropriate I and W_max values for copper array
-Why are no muons stopping inside the array?

@@ -19,6 +19,8 @@ def number_stopped(ages):
     return stopped
 
 def graph_ages(ages):
+    """Graphs the population number for stationary muons in the array as a function of time spent stationary in the array"""
+
     lifetimes = [] #Collects all muons which have self.age != 1, i.e. decayed inside the matrix
     values = [] #Time spent stationary in matrix
     
@@ -49,7 +51,7 @@ def graph_ages(ages):
 
 
         plt.scatter(values, remaining_muons)
-        plt.title('Population graph of muons in array after each time')
+        plt.title(f'Population graph of muons in array after each time, for {len(lifetimes)} muons.')
         plt.xlabel('Lifetime of muons in array')
         plt.ylabel('Muon Population')
         plt.savefig('Muon_Pop_v_time.png')

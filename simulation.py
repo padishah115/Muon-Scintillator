@@ -1,209 +1,288 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+from array_scintillator_sipm import *
 from muon import Muon
-from array_stopping_power import *
+from scintillator_label import *
 from bethe_equation import *
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+#import datetime
 
+def run_simulation_and_return_age(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, dx=5):
+    """Runs the simulation and returns the muon ages (muon age of 0 indicates that the muon did not decay inside of the array)"""
 
-"""Make sure that the simulation and run sim/plot methods are actually doing the same thing"""
+    t = 0
 
-def run_simulation_and_plot(t_max, array_dimension, efficiency, rho, a_no, m_no, exc_energy):
+    #Initialise array
+    array = Array(array_dimension, sipms_per_scintillator)
 
-    t = 0 #Initialise time
-
-    #These are two matrices for plotting "pulse" vs time.
-    detection_array = [] #Overall signal master array
-    times = []
-
-    #25 Scintillators
-    """
-        1  2  3  4  5
-        6  7  8  9  10
-        11 12 13 14 15
-        16 17 18 19 20
-        21 22 23 24 25
-
-    """
-
-    scintillator_detections = {
-        #Stores detection events for each of the 25 scintillators in the array
-
-        'det1': [],
-        'det2': [],
-        'det3': [],
-        'det4':[],
-        'det5': [],
-        'det6': [],
-        'det7': [],
-        'det8': [],
-        'det9': [],
-        'det10': [],
-        'det11': [],
-        'det12': [],
-        'det13': [],
-        'det14': [],
-        'det15': [],
-        'det16': [],
-        'det17': [],
-        'det18': [],
-        'det19': [],
-        'det20': [],
-        'det21': [],
-        'det22': [],
-        'det23': [],
-        'det24': [],
-        'det25': []
-
-    }
-
-
+    #Initialise muon
     muon1 = Muon(array_dimension)
 
+    in_matrix = False
+    in_motion = False
 
-    #The physical scintillator matrix.
-    matrix = np.zeros((array_dimension,array_dimension,array_dimension))
+    while t <= tmax:
+        #print(muon1.position)
 
-    #Initial position of the muon.
-    print(muon1.position)
-    print(muon1.velocity)
+        #Check to see whether the muon is in the array
+        in_matrix = muon1.is_contained()
+        #Check to see whether the muon is in motion
+        in_motion = muon1.is_in_motion()    
+        #Check to see whether the muon has decayed
+        decayed = muon1.decayed
+        #Determines which scintillator was triggered.
+        a = get_scintillator_label(muon1.position, array_dimension) 
+        scintillator_index = a - 1
+        #Reset all sipms to FALSE for flashed
+        array.reset_SIPMS()
 
-    while t < t_max:
-        """Main loop- the muon starts at the top of the array and then passes through the scintillators."""
-        detection_status = 0 #Prevents double detection
-        a = 0 #Determines which scintillator was triggered
+        if in_motion:
+            #Calculate what happens if the muon is in motion
+            
+            if not in_matrix:
+                #Muon is in motion and OUTSIDE the array.
+                pass
 
-        for i in range (0,3):
-            #Check to see whether the muon is still inside of the scintillating array
-            if muon1.position[i] >= array_dimension or muon1.position[i] < 0:
-                muon1.in_matrix = False
-        
-        x = muon1.position[0]
-        y = muon1.position[1]
-        z = muon1.position[2]
-
-        """LABELLING THE SCINTILLATOR WHICH THE MUON IS IN in order to append the detection event to the correct scintillator"""
-        if z <= 4 and x <= 4:
-            a = 5*z + x + 1
-        
-        elif z > 4 or x > 4:
-            a = 0 #a is 0 if Not in array at all
-
-
-        if muon1.in_motion:
-            chance_sipm = np.random.random() #Check to see whether SiPM picks up the signal based on efficiency
-            if chance_sipm <= efficiency and muon1.in_matrix and muon1.in_motion:
-                #Check against quantum efficiency
-                matrix[x, :, z] += 1
-                print("Detection event")
-                if detection_status == 0:
-                    detection_array.append(1)
-                    detection_status = 1
             else:
-                if detection_status == 0:
-                    detection_array.append(0)
-            
-            if muon1.in_matrix:
-                #Stoppping power calculation
+                #Muon is in motion and INSIDE the array.
+                
+                # 1: Check to see whether the SiPMs in the current scintillator detect the light or not
+                if a == 0:
+                    print('Error- muon said to be inside matrix but returning scintillator label outside of the matrix')
+                else:
+                    scintillator = array.scintillators[scintillator_index] #This calls the relevant scintillator object
+                    for i, sipm in enumerate(scintillator.sipms):
+                                if sipm.caught_light():
+                                    #If the SIPM caught the signal from the scintillator flash, update the corresponding slot in the scintillator detections matrix.
+                                    scintillator.detections[i] += 1
+                                    sipm.flashed = True
+                                    print('A SiPM pinged! a')
 
-                de = abs(rho * bethe_equation(a_no, m_no, muon1.gamma, muon1.get_beta(), muon1.mass, exc_energy) * 5) #5 cm steps from scintillator to scintillator 
-                muon1.energy -= de #Reduces the energy of the muon in line with the Bethe equation
-                #print(muon1.energy)
-                muon1.update_gamma() #Update gamma given the new energy
-                muon1.update_velocity() #Update the velocity given the new gamma!
+                # 2: Calculate the energy loss due to the stopping power of the array.
+                rho_de_dx = abs(bethe_equation(atomic_no, mass_no, muon1.get_gamma(), muon1.get_beta(), muon1.mass, excitation_energy, rho))
+                de = abs(rho_de_dx * dx)
 
-                # if check_stop(muon1.energy, stppw, rho, muon1.distance_travelled_in_array):
-                #     muon1.velocity = np.array([0,0,0])
-                #     muon1.in_motion = False
-                #     #print("Muon has stopped inside of the array.")
-
-
-            muon1.position = np.add(muon1.position, muon1.velocity)
-            muon1.position = np.rint(muon1.position).astype(int)
-            if not muon1.velocity.all(0) and muon1.in_matrix:
-                muon1.distance_travelled_in_array += 1
-
-
-        elif not muon1.in_motion and not muon1.decayed and muon1.in_matrix:
-            #Check to see whether the muon, having stopped in the array, decays
-            decay_probability = 1 - np.exp(-muon1.age/muon1.lifetime)
-            muon1.age += 1 #Lifetime after stopping
-
-            chance_decay = np.random.random()
-
-            if chance_decay < decay_probability:
-                #Check against a random variable to see whether decay has occurred
-                muon1.decayed = True
-                #print("Muon has decayed")
-                matrix[x, :, z] += 1
-                if detection_status == 0:
-                    detection_array.append(1)
-                    detection_status = 1
+                #Decrease the energy of the muon appropriately
+                muon1.energy -= de
+                muon1.update_gamma()
+                muon1.update_velocity()
         
-        if muon1.energy <= muon1.mass:
-            #If energy falls to rest mass then the muon cannot be in motion
-            muon1.in_motion = False
+        elif not in_motion:
+            #Muon not in motion! Let's explicitly set the velocity to 0 just in case, though this should have already been taken care of.
+            muon1.velocity = np.array([0,0,0])
             
-        for i in range(len(scintillator_detections)):
-            #Append 0 in any case, and then replace this with 1 if there is a detection. 
-            #Ensures that the dimensions of the scintillator detections arrays are correct.
-            scintillator_detections[f'det{i+1}'].append(0)
+            if not in_matrix:
+                #Should be impossible: muon shouldn't be stationary outside the matrix
+                print('Error- stationary muon outside of array. c')
+            
+            else:
+                #Muon stationary and inside of the matrix
+                if decayed:
+                    #Muon has already decayed. Nothing to see here.
+                    pass
 
-        if detection_status == 1 and a != 0:
-            scintillator_detections[f'det{a}'][-1] = 1
+                else:
+                    #Check to see whether the muon now decays
+                    if muon1.decays():
+                        #The muon has decayed!
+                        if a == 0:
+                            print('Error- muon decay not occuring within the matrix d')
+                        else:
+                            scintillator = array.scintillators[scintillator_index] #This calls the relevant scintillator object
+                            for i, sipm in enumerate(scintillator.sipms):
+                                if sipm.caught_light():
+                                    #If the SIPM caught the signal from the scintillator flash, update the corresponding slot in the scintillator detections matrix.
+                                    scintillator.detections[i] += 1 #Update corresponding scintillator array
+                                    sipm.flashed = True
+                                    print('A SiPM pinged! e')
+                        print('Muon has decayed inside of the array! f')
+                    else:
+                        #The muon lives to fight another day. Update his age inside of the matrix
+                        muon1.age += 1
+        else:
+            print('Error- neither in motion nor not in motion')
 
-        times.append(t)
+        #Updates sipm detections list based on whether the sipm.flashed value is true or false
+        array.update_sipms()
+        
+        #MAKE SURE TO UPDATE GAMMA AND VELOCITY BEFORE THIS. THIS SHOULD BE THE VERY LAST STEP.
+        muon1.update_position()
+
         t += 1
 
-        #Sanity-check output on the console
-        print(muon1.position)
-        print(f"Time is {t}")
+    return muon1.age
 
 
 
-    detection_plane = matrix[:, 0, :]
+def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, dx=5):
+    """Runs the simulation and plots graphs showing detection events for each scintillator"""
 
-    #Prints the "detection plane", i.e. slices of constant Y, to give quick visual check in the console window
-    print(detection_plane)
+    t = 0
 
-    #Generating Meshgrids- X is the horizontal dimenion, Y is 
+    #Initialise array
+    array = Array(array_dimension, sipms_per_scintillator)
+
+    #Initialise muon
+    muon1 = Muon(array_dimension)
+
+    in_matrix = False
+    in_motion = False
+
+    while t <= tmax:
+        #print(muon1.position)
+
+        #Check to see whether the muon is in the array
+        in_matrix = muon1.is_contained()
+        #Check to see whether the muon is in motion
+        in_motion = muon1.is_in_motion()    
+        #Check to see whether the muon has decayed
+        decayed = muon1.decayed
+        #Determines which scintillator was triggered.
+        a = get_scintillator_label(muon1.position, array_dimension) 
+        scintillator_index = a - 1
+        #Reset all sipms to FALSE for flashed
+        array.reset_SIPMS()
+
+        if in_motion:
+            #Calculate what happens if the muon is in motion
+            
+            if not in_matrix:
+                #Muon is in motion and OUTSIDE the array.
+                pass
+
+            else:
+                #Muon is in motion and INSIDE the array.
+                
+                # 1: Check to see whether the SiPMs in the current scintillator detect the light or not
+                if a == 0:
+                    print('Error- muon said to be inside matrix but returning scintillator label outside of the matrix')
+                else:
+                    scintillator = array.scintillators[scintillator_index] #This calls the relevant scintillator object
+                    for i, sipm in enumerate(scintillator.sipms):
+                                if sipm.caught_light():
+                                    #If the SIPM caught the signal from the scintillator flash, update the corresponding slot in the scintillator detections matrix.
+                                    scintillator.detections[i] += 1
+                                    sipm.flashed = True
+                                    print('A SiPM pinged! a')
+
+                # 2: Calculate the energy loss due to the stopping power of the array.
+                rho_de_dx = abs(bethe_equation(atomic_no, mass_no, muon1.get_gamma(), muon1.get_beta(), muon1.mass, excitation_energy, rho))
+                de = abs(rho_de_dx * dx)
+
+                #Decrease the energy of the muon appropriately
+                muon1.energy -= de
+                muon1.update_gamma()
+                muon1.update_velocity()
+        
+        elif not in_motion:
+            #Muon not in motion! Let's explicitly set the velocity to 0 just in case, though this should have already been taken care of.
+            muon1.velocity = np.array([0,0,0])
+            
+            if not in_matrix:
+                #Should be impossible: muon shouldn't be stationary outside the matrix
+                print('Error- stationary muon outside of array. c')
+            
+            else:
+                #Muon stationary and inside of the matrix
+                if decayed:
+                    #Muon has already decayed. Nothing to see here.
+                    pass
+
+                else:
+                    #Check to see whether the muon now decays
+                    if muon1.decays():
+                        #The muon has decayed!
+                        if a == 0:
+                            print('Error- muon decay not occuring within the matrix d')
+                        else:
+                            scintillator = array.scintillators[scintillator_index] #This calls the relevant scintillator object
+                            for i, sipm in enumerate(scintillator.sipms):
+                                if sipm.caught_light():
+                                    #If the SIPM caught the signal from the scintillator flash, update the corresponding slot in the scintillator detections matrix.
+                                    scintillator.detections[i] += 1 #Update corresponding scintillator array
+                                    sipm.flashed = True
+                                    print('A SiPM pinged! e')
+                        print('Muon has decayed inside of the array! f')
+                    else:
+                        #The muon lives to fight another day. Update his age inside of the matrix
+                        muon1.age += 1
+        else:
+            print('Error- neither in motion nor not in motion')
+
+        #Updates sipm detections list based on whether the sipm.flashed value is true or false
+        array.update_sipms()
+        
+        #MAKE SURE TO UPDATE GAMMA AND VELOCITY BEFORE THIS. THIS SHOULD BE THE VERY LAST STEP.
+        muon1.update_position()
+
+        t += 1
+
+    #RECALL- WE ARE NO LONGER STORING SCINTILLATOR FLASHES WITHIN THE MATRIX ELEMENT. 
+    #WE ARE NOW INSTEAD STORING THEM IN A MULTIDIMENSIONAL ARRAY INSIDE OF EACH SCINTILLATOR CLASS
+
+
+    detection_plane = array.return_detection_plane()
+    #print(detection_plane)
+
+    #Generating Meshgrids
     X, Y = np.meshgrid(np.arange(array_dimension), np.arange(array_dimension))
     X_flatten = X.flatten()
     Y_flatten = Y.flatten()
-    detection_flatten = detection_plane.flatten()
 
-    #Generate 3D graph
+
+    # #Generate 3D graph
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    for i, k, detection in zip(X_flatten, Y_flatten, detection_flatten):
-        if detection > 0:
-            ax.bar3d(i, k, 0, 1, 1, detection, color='r', alpha=0.8)
+    #List of colours
+    colors = ['r', 'g', 'b', 'c', 'y', 'k', 'w', 'm']
 
+    for x in range(array.sipms_per_scintillator):
+        #Generate z values for each slice of the detection plane, i.e. for each sipm
+        detection_flatten = detection_plane[x, :, :].flatten()
+        color1 = colors[x % len(colors)] #Make sure each sipm gets its own color
+
+        for i, k, detection in zip(X_flatten, Y_flatten, detection_flatten):
+            if detection > 0:
+                ax.bar3d(k, i, x, 1, 1, detection, color=color1, alpha=0.8, label=f'SiPM{x}')
+
+
+    max_height = 2 * array.sipms_per_scintillator #Maximum number of detections if each sipm flashes twice
 
     #3D Bar graph which graphically displays detection events
     plt.ylabel('Horizonal axis (i)')
     plt.xlabel('Height (k)')
-    plt.title('0 is max height, 5 is bottom of array')
+    plt.title(f'0 is max height, 5 is bottom of array. Muon energy: {muon1.energy}')
     ax.set_xlim(0,array_dimension)
     ax.set_ylim(0,array_dimension)
-    ax.set_zlim(0,2)
-    plt.savefig('detection_bars.png')
+    ax.set_zlim(0,max_height)
+    plt.savefig(f'detection_bars_energy_{muon1.energy:2f}.png')
     plt.show()
 
     #Plots for all scintillators
     fig, axs = plt.subplots(array_dimension, array_dimension, figsize = (20, 20))
 
-    a_count = 1
-    x = times
+    x = np.arange(0, tmax+1)
 
-    #Populate the 25 graphs with the signals from each scintillator
+    #List of styles
+    styles = ['-', '--', '-.', ':', ',', 'o', '^']
+
+    #Populate the dim*dim graphs with the signals from each scintillator
     for i in range(array_dimension):
-        for j in range(array_dimension):
-            y = scintillator_detections[f'det{a_count}']
-            axs[i,j].plot(x,y)
-            axs[i,j].set_title(f'{a_count}')
-            #axs[i,j].set_xlabel('Time')
+         for j in range(array_dimension):
+            #Initialise graph for each scintillator in the array
+            scintillator_index = i*array_dimension + j
+            sipm_number = array.sipms_per_scintillator
+            scintillator = array.scintillators[scintillator_index]
+
+            for k in range(sipm_number):
+                #One plot per scintillator graph per SiPM
+                y = scintillator.sipms[k].detections
+                axs[i,j].plot(x,y, label=f'SiPM {k+1}', color=colors[k % len(colors)], linestyle=styles[k % len(styles)])
+                axs[i,j].legend()
+
+            axs[i,j].set_title(f'{scintillator_index+1}')
+            axs[i,j].set_xlabel('Time')
 
             if j == 0:
                 #Only add y axis labels to leftmost column in order to conserve space
@@ -211,176 +290,8 @@ def run_simulation_and_plot(t_max, array_dimension, efficiency, rho, a_no, m_no,
             if j != 0 :
                 #Remove the ticks from the y axis if the graph is not in the leftmost column
                 axs[i,j].tick_params(labelleft=False)
-            a_count += 1
 
     plt.tight_layout()
-    plt.savefig('pulse graphs')
+    plt.savefig(f'pulse graphs energy {muon1.energy:2f}.png')
     plt.show()
-
-
-
-
-def run_simulation_and_return_age(t_max, array_dimension, efficiency, rho, a_no, m_no, exc_energy): 
-    """Removes all graphical displays or printed values. Takes as arguments: t_max of simulation, dimension for the square array, atomic number of the material,
-    average excitation energy, W_max as max transfer of energy in collision"""
-
-    t = 0 #Initialise time
-
-    #These are two matrices for plotting "pulse" vs time.
-    detection_array = [] #Overall signal master array
-    times = []
-
-    #25 Scintillators
-    """
-        1  2  3  4  5
-        6  7  8  9  10
-        11 12 13 14 15
-        16 17 18 19 20
-        21 22 23 24 25
-
-    """
-
-    scintillator_detections = {
-        #Stores detection events for each of the 25 scintillators in the array
-
-        'det1': [],
-        'det2': [],
-        'det3': [],
-        'det4': [],
-        'det5': [],
-        'det6': [],
-        'det7': [],
-        'det8': [],
-        'det9': [],
-        'det10': [],
-        'det11': [],
-        'det12': [],
-        'det13': [],
-        'det14': [],
-        'det15': [],
-        'det16': [],
-        'det17': [],
-        'det18': [],
-        'det19': [],
-        'det20': [],
-        'det21': [],
-        'det22': [],
-        'det23': [],
-        'det24': [],
-        'det25': []
-
-    }
-
-
-
-    muon1 = Muon(array_dimension)
-
-
-    #The physical scintillator matrix.
-    matrix = np.zeros((array_dimension,array_dimension,array_dimension))
-
-    #Initial position of the muon.
-    #print(muon1.position)
-    #print(muon1.velocity)
-
-    while t < t_max:
-        """Main loop- the muon starts at the top of the array and then passes through the scintillators."""
-        detection_status = 0 #Prevents double detection
-        a = 0 #Determines which scintillator was triggered
-
-        for i in range (0,3):
-            #Check to see whether the muon is still inside of the scintillating array
-            if muon1.position[i] >= array_dimension or muon1.position[i] < 0:
-                muon1.in_matrix = False
-        
-        x = muon1.position[0]
-        y = muon1.position[1] #Scintillator bar axis
-        z = muon1.position[2]
-
-        """LABELLING THE SCINTILLATOR WHICH THE MUON IS IN in order to append the detection event to the correct scintillator"""
-        if z <= 4 and x <= 4:
-            a = 5*z + x + 1
-        
-        elif z > 4 or x > 4:
-            a = 0 #a is 0 if Not in array at all
-
-
-        if muon1.in_motion:
-            chance_sipm = np.random.random() #Check to see whether SiPM picks up the signal based on efficiency
-            if chance_sipm <= efficiency and muon1.in_matrix and muon1.in_motion:
-                #Check against quantum efficiency
-                matrix[x, :, z] += 1
-                #print("Detection event")
-                if detection_status == 0:
-                    detection_array.append(1)
-                    detection_status = 1
-            else:
-                if detection_status == 0:
-                    detection_array.append(0)
-            
-            if muon1.in_matrix:
-                #Stoppping power calculation
-
-                de = abs(rho * bethe_equation(a_no, m_no, muon1.gamma, muon1.get_beta(), muon1.mass, exc_energy) * 5) #5 cm steps from scintillator to scintillator 
-                muon1.energy -= de #Reduces the energy of the muon in line with the Bethe equation
-                #print(muon1.energy)
-                muon1.update_gamma() #Update gamma given the new energy
-                muon1.update_velocity() #Update the velocity given the new gamma!
-
-                # if check_stop(muon1.energy, stppw, rho, muon1.distance_travelled_in_array):
-                #     muon1.velocity = np.array([0,0,0])
-                #     muon1.in_motion = False
-                #     #print("Muon has stopped inside of the array.")
-
-            muon1.position = np.add(muon1.position, muon1.velocity)
-            muon1.position = np.rint(muon1.position).astype(int)
-            # if not muon1.velocity.all(0) and muon1.in_matrix:
-            #     muon1.distance_travelled_in_array += 1
-
-
-        elif not muon1.in_motion and not muon1.decayed and muon1.in_matrix:
-            #Check to see whether the muon, having stopped in the array, decays
-
-            #Muon.age = 0 the first time this is calculated
-            decay_probability = 1 - np.exp(-muon1.age/muon1.lifetime)
-            muon1.age += 1 #Lifetime after stopping
-
-            chance_decay = np.random.random()
-
-            if chance_decay < decay_probability:
-                #Check against a random variable to see whether decay has occurred
-                muon1.decayed = True
-                #print("Muon has decayed")
-                matrix[x, :, z] += 1
-                if detection_status == 0:
-                    detection_array.append(1)
-                    detection_status = 1
-            
-        if muon1.energy <= muon1.mass:
-            #If energy falls to rest mass then the muon cannot be in motion
-            muon1.in_motion = False
-        
-        for i in range(len(scintillator_detections)):
-            #Append 0 in any case, and then replace this with 1 if there is a detection. 
-            #Ensures that the dimensions of the scintillator detections arrays are correct.
-            scintillator_detections[f'det{i+1}'].append(0)
-
-        if detection_status == 1 and a != 0:
-            #Check to see whether there was a detection, and if so, append to the relevant detector "det" list at the most recent position
-            scintillator_detections[f'det{a}'][-1] = 1
-
-        times.append(t)
-        t += 1
-
-        #Sanity-check output on the console
-        #print(muon1.position)
-        #print(f"Time is {t}")
-
-
-
-    #detection_plane = matrix[:, 0, :]
-
-    #Prints the "detection plane", i.e. slices of constant Y, to give quick visual check in the console window
-    #print(detection_plane)
-
-    return(muon1.age)
+    

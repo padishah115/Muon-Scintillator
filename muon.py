@@ -9,6 +9,8 @@ class Muon:
         self.array_dimension = array_dim
         self.mass = 206 * 0.511 #Muon mass in MeV
         self.max_angle_deg = 45 #Maximal zenith angle of the muons in units of degrees
+        self.max_energy = 10000 #Maximum energy in distribution in MeV
+        self.default_energy = 4000 #Default energy in MeV
 
         #First, generate energy using distribution. Use this to generate gamma. This, in turn, can be used to compute the velocity in natural units
         self.energy = self.generate_energy() #Energy in MeV
@@ -18,12 +20,13 @@ class Muon:
         #Set c = 1
         self.velocity = self.generate_velocity(1) #Returns velocity array 
         self.position = self.generate_position()
+        self.theta
 
         
 
         #Start the simulation with the muon inside of the matrix at t = 0, not decayed, and in motion.
-        self.in_matrix = True #Is the muon still inside of the scintillating array?
-        self.in_motion = True #Is the muon in motion?
+        #self.in_matrix = True #Is the muon still inside of the scintillating array?
+        #self.in_motion = True #Is the muon in motion?
         self.decayed = False #Has the muon decayed?
 
         self.distance_travelled_in_array = 1 #At beginning of simulation, all muons have already entered the array and hence travelled 1 block
@@ -31,6 +34,8 @@ class Muon:
         self.lifetime = 2.2 #Characteristic decay time
         self.age = 0
 
+
+    #GENERATORS
 
     def generate_position(self):
         """Generates the initial position of the muon given the velocity."""
@@ -90,9 +95,9 @@ class Muon:
         """Generates a random energy between 1 and 10 Gev in steps of 1, using the paper
         https://arxiv.org/pdf/1606.06907.pdf as my reference"""
 
-        energy = 4000 #default value is 4000 MeV
+        energy = self.default_energy #default value is 4000 MeV
 
-        energies = np.arange(self.mass, 10000, 1) #Energies between 105 MeV and 10000 MeV, increments of 1 MeV
+        energies = np.arange(self.mass, self.max_energy, 1) #Energies between 105 MeV and 10000 MeV, increments of 1 MeV
 
         normalisation_factor = 0
 
@@ -113,33 +118,9 @@ class Muon:
                 ready = True
 
         return energy
+    
 
-    def get_gamma(self):
-        
-        e = self.energy #Energy in MeV
-        m = self.mass #Muon Mass in MeV
-        gamma = e / m
-
-        return gamma
-
-    def update_gamma(self):
-        if self.energy > self.mass:
-            e = self.energy #Energy in MeV
-            m = self.mass # Muon Mass in MeV
-            gamma = e / m
-        
-        elif self.energy <= self.mass:
-            #Ensure that gamma never less than 1
-            #Make the muon stationary
-            self.velocity = np.array([0,0,0])
-            gamma = 1
-
-        self.gamma = gamma
-
-    # def update_velocity(self):
-    #     return 0
-
-    def generate_theta(self):
+    def calculate_theta(self):
         """The muon cosmic ray spectrum is proportional to cos^2(theta)
         This function generates values of zenith angle, theta, given this distribution
         """
@@ -170,7 +151,9 @@ class Muon:
             We need the returned velocity matrix to contain only integer values...
         """
 
-        theta = self.generate_theta()
+        theta = self.calculate_theta()
+        self.theta = theta
+        
 
         v_z = v * np.cos(theta) #Project out the z component
         v_s = v * np.sin(theta) #Projects onto the x-y plane
@@ -188,17 +171,85 @@ class Muon:
         #c=1 so use beta to find overall value of velocity
         velocity = np.multiply(velocity, beta)
 
+
         return velocity
+    
+    #RETURNS
+
+    def get_gamma(self):
+        
+        e = self.energy #Energy in MeV
+        m = self.mass #Muon Mass in MeV
+        gamma = e / m
+
+        return gamma
+    
+    def get_beta(self):
+        """Returns absolute magnitude of velocity as a fraction of c"""
+        gamma = self.gamma
+        beta = np.sqrt(1 - 1/gamma**2)
+
+        return beta
+    
+    #MUTATORS
+
+    def update_gamma(self):
+        """Updates value of gamma based on energy loss. ALWAYS CALL THIS BEFORE UPDATING VELOCITY"""
+        if self.energy > self.mass:
+            e = self.energy #Energy in MeV
+            m = self.mass # Muon Mass in MeV
+            gamma = e / m
+        
+        elif self.energy <= self.mass:
+            #Ensure that gamma never less than 1
+            #Make the muon stationary
+            self.velocity = np.array([0,0,0])
+            gamma = 1
+
+        self.gamma = gamma
+    
 
     def update_velocity(self):
+        """Updates velocity based on updated values of gamma. ALWAYS CALL THIS AFTER UPDATE_GAMMA"""
         gamma = self.gamma
         beta = np.sqrt(1-1/gamma**2)
 
         #Velocity init
         self.velocity = np.multiply(self.velocity, beta)
 
-    def get_beta(self):
-        gamma = self.gamma
-        beta = np.sqrt(1 - 1/gamma**2)
 
-        return beta
+    def update_position(self):
+        """Updates the position of the particle"""
+        self.position = np.rint(np.add(self.position, self.velocity)).astype(int)
+
+
+    #LOGIC CHECKERS
+        #Is the muon contained in the matrix?
+        #Is the muon still in motion?
+        #Does the muon decay?
+
+    def is_contained(self):
+        """Checks to see whether the muon is contained within the array matrix"""
+        for i in range (0,3):
+        #Check to see whether the muon is still inside of the scintillating array
+            if self.position[i] >= self.array_dimension or self.position[i] < 0:
+                return False
+        return True
+
+    def is_in_motion(self):
+        """Checks to see whether the muon is still in motion"""
+        if any(self.velocity):
+            return True
+        else:
+            return False
+        
+    def decays(self):
+        """Check to see whether the muon decays given its age. If it has decayed, set "decayed" to true"""
+        chance = np.random.random()
+        exp = np.exp(-self.age / self.lifetime)
+
+        if chance < exp:
+            return False
+        else:
+            self.decayed = True
+            return True

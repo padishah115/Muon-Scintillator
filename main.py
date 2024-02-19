@@ -1,52 +1,27 @@
-from array_stopping_power import *
 from simulation import *
 from lifetime_processing import *
 
+#Number of times the simulation is run
+simulation_number = 50
+#Max time step in each iteration of the simulation
+tmax = 20
 
-"""
-TO DO:
-    Calculate the stopping power of the array and use this to determine whether the muon comes to a stop inside of the
-        array.
-
-    Make a graph showing the characteristic lifetime of muons which decay in the apparatus.
-
-
-UNITS: MeV, cm, 100s of picoseconds
-
-For a muon at sea level, expect an energy of 4 GeV. This translates to a beta*gamma of about 38 
-
-"""
-
-#Properties of the copper array
-copper_rho = 8.96 #Density in g/cm^3
-copper_atomic_number = 29
-copper_atomic_mass = 63.5
-excitation_energy = 3 #In eV, based on light of wavelength 425nm
-
-#Quantum efficiency of SiPM
-efficiency = 0.8
-
-#Setting duration of the simulation. The program will run from t=0 to t=tmax. Increments are in the ballpark of about 200ps
-t = 0
-t_max = 20
-sim_num = 1000
-
-#Dimensions of the scintillator array- DO NOT CHANGE THIS
 array_dimension = 5
+sipms_per_scintillator = 2
+atomic_no = 29
+mass_no = 63.5
+excitation_energy = 3 #In eV, based on light of wavelength 425nm
+rho = 8.96 #density in g/cm^3
 
-ages = []
+# ages = []
 
-for x in range(sim_num):
-    a = run_simulation_and_return_age(t_max, array_dimension, efficiency, copper_rho, copper_atomic_number, copper_atomic_mass, excitation_energy)
-    ages.append(a) #a = 0 implies that the muon never stopped inside the array
+# for i in range(simulation_number):
+#     #Run the simulation a number of times equivalent to the simulation number, each time returning an age
+#     age = run_simulation_and_return_age(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho)
+#     ages.append(age)
 
-print(ages)
-print(f"{number_stopped(ages)} stopped in total")
-print(f"{percentage_stopped(ages):.2f} % of muons stopped in the array") # prints the percentage of muons which were stopped in the array
-graph_ages(ages)
+# print(f'Percentage of muons stopped in array: {percentage_stopped(ages)} % ({number_stopped(ages)} muons total)')
 
-#Nice to have a graph
-#run_simulation_and_plot(t_max, array_dimension, efficiency, copper_rho, copper_atomic_number, copper_atomic_mass, excitation_energy)
+# graph_ages(ages)
 
-
-
+run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho)
