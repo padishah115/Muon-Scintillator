@@ -1,18 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def percentage_stopped(ages):
+def percentage_stopped(stops):
     stopped = 0
-    number = len(ages)
-    for x in ages:
+    number = len(stops)
+    for x in stops:
         if x != 0:
             stopped += 1
     percentage = stopped / number * 100
     return percentage
 
-def number_stopped(ages):
+def number_stopped(stops):
     stopped = 0
-    for x in ages:
+    for x in stops:
         if x != 0:
             stopped += 1
     
@@ -33,31 +33,23 @@ def graph_ages(ages):
         initial_population = len(lifetimes) #Initial number of muons which are stationary, i.e. population at t=0
         max_lifetime = np.max(lifetimes) #Maximum age of muons in the array
 
-        values = np.arange(0, max_lifetime+1) #Values of lifetimes
-        frequencies = np.zeros_like(values) #Number of muons at each lifetime
+        bin_width = 0.1
+        bins = np.arange(0, max_lifetime + bin_width, bin_width)
 
-        
-        frequencies[0] = 0 #Zero muons decay after 0 time
+        frequencies, edges = np.histogram(lifetimes, bins=bins)
+        bin_centers = 0.5 * (edges[:-1] + edges[1:])
 
-        for time in lifetimes:
-            frequencies[time] += 1
+        decayed = np.cumsum(frequencies)
+        remaining_muons = initial_population - decayed
 
-
-        decayed = np.cumsum(frequencies) #Cumulative sum of how many have decayed using the ages matrix
-        remaining_muons = np.zeros_like(frequencies)
-
-        for i in range (len(decayed)):
-            remaining_muons[i] = initial_population - decayed[i]
-
-
-        plt.scatter(values, remaining_muons)
-        plt.title(f'Population graph of muons in array after each time, for {len(lifetimes)} muons.')
+        plt.scatter(bin_centers, remaining_muons)
+        plt.title(f'Population graph of muons in array after each time, for {initial_population} muons.')
         plt.xlabel('Lifetime of muons in array')
         plt.ylabel('Muon Population')
+        plt.grid(True)
         plt.savefig('Muon_Pop_v_time.png')
         plt.show()
 
     else:
         print("No muons decayed in simulation")
-
     

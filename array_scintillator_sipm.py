@@ -1,17 +1,5 @@
 import numpy as np
 
-"""
-                TO DO AND DESIRED FUNCTIONALITY FOR THE SIPM AND ARRAY CLASSES
-                -Each array should have a cubic matrix representation used to store values
-                -Eventually want a way of declaring explicitly how many SiPMs we want per scintillator
-
-                Structure:
-                    Each array has a list of Scintillators
-                    Each scintillator itself has a list of SIPMS
-
-
-"""
-
 mean_efficiency = 0.8 #Modal/median/mean efficiency of the SiPMs
 sigma_eff = 0.05 #Standard deviation of the efficiencies of the SiPMs
 

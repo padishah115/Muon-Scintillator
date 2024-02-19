@@ -7,8 +7,9 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 #import datetime
 
-def run_simulation_and_return_age(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, dx=5):
-    """Runs the simulation and returns the muon ages (muon age of 0 indicates that the muon did not decay inside of the array)"""
+def run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, dx=5):
+    """Runs the simulation and returns the decayed muon ages (muon age of 0 indicates that the muon did not decay inside of the array), and whether the
+    muon was stopped in the array as a 0 or 1 value"""
 
     t = 0
 
@@ -56,16 +57,39 @@ def run_simulation_and_return_age(tmax, sipms_per_scintillator, array_dimension,
                                     #If the SIPM caught the signal from the scintillator flash, update the corresponding slot in the scintillator detections matrix.
                                     scintillator.detections[i] += 1
                                     sipm.flashed = True
-                                    print('A SiPM pinged! a')
+                                    #print('A SiPM pinged! a')
 
-                # 2: Calculate the energy loss due to the stopping power of the array.
+                # 2: Check chance of decay
+                
+                if muon1.decays():
+                    #The muon has decayed!
+                    muon1.decayed = True
+                    if a == 0:
+                            print('Error- muon decay not occuring within the matrix d')
+                    else:
+                        scintillator = array.scintillators[scintillator_index] #This calls the relevant scintillator object
+                        for i, sipm in enumerate(scintillator.sipms):
+                            if sipm.caught_light():
+                                #If the SIPM caught the signal from the scintillator flash, update the corresponding slot in the scintillator detections matrix.
+                                scintillator.detections[i] += 1 #Update corresponding scintillator array
+                                sipm.flashed = True
+                                #print('A SiPM pinged! e')
+                        #print('Muon has decayed inside of the array! f')
+
+
+                # 3: Calculate the energy loss due to the stopping power of the array.
                 rho_de_dx = abs(bethe_equation(atomic_no, mass_no, muon1.get_gamma(), muon1.get_beta(), muon1.mass, excitation_energy, rho))
                 de = abs(rho_de_dx * dx)
+
 
                 #Decrease the energy of the muon appropriately
                 muon1.energy -= de
                 muon1.update_gamma()
                 muon1.update_velocity()
+
+                #Update muon rest-frame lifetime, accounting for time dilation
+                muon1.age += 1 / muon1.get_gamma()
+                
         
         elif not in_motion:
             #Muon not in motion! Let's explicitly set the velocity to 0 just in case, though this should have already been taken care of.
@@ -85,6 +109,7 @@ def run_simulation_and_return_age(tmax, sipms_per_scintillator, array_dimension,
                     #Check to see whether the muon now decays
                     if muon1.decays():
                         #The muon has decayed!
+                        muon1.decayed = True
                         if a == 0:
                             print('Error- muon decay not occuring within the matrix d')
                         else:
@@ -94,8 +119,8 @@ def run_simulation_and_return_age(tmax, sipms_per_scintillator, array_dimension,
                                     #If the SIPM caught the signal from the scintillator flash, update the corresponding slot in the scintillator detections matrix.
                                     scintillator.detections[i] += 1 #Update corresponding scintillator array
                                     sipm.flashed = True
-                                    print('A SiPM pinged! e')
-                        print('Muon has decayed inside of the array! f')
+                                    #print('A SiPM pinged! e')
+                        #print('Muon has decayed inside of the array! f')
                     else:
                         #The muon lives to fight another day. Update his age inside of the matrix
                         muon1.age += 1
@@ -110,8 +135,21 @@ def run_simulation_and_return_age(tmax, sipms_per_scintillator, array_dimension,
 
         t += 1
 
-    return muon1.age
+    #RETURN VALUES OF THE SIMULATION:
+        #Two values returned: the age (float) and whether the muon was stopped (boolean)
 
+    if muon1.decayed and in_motion:
+        #Muon decayed but wasn't stopped
+        return muon1.age, 0
+    elif muon1.decayed and not in_motion:
+        #Muon decayed and was stopped
+        return muon1.age, 1
+    elif not muon1.decayed and in_motion:
+        #Muon neither decayed nor stopped
+        return 0, 0
+    else:
+        #Muon stopped but not decayed
+        return 0, 1
 
 
 def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, dx=5):
@@ -165,14 +203,37 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
                                     sipm.flashed = True
                                     print('A SiPM pinged! a')
 
-                # 2: Calculate the energy loss due to the stopping power of the array.
+                # 2: Check chance of decay
+                
+                if muon1.decays():
+                    #The muon has decayed!
+                    muon1.decayed = True
+                    if a == 0:
+                            print('Error- muon decay not occuring within the matrix d')
+                    else:
+                        scintillator = array.scintillators[scintillator_index] #This calls the relevant scintillator object
+                        for i, sipm in enumerate(scintillator.sipms):
+                            if sipm.caught_light():
+                                #If the SIPM caught the signal from the scintillator flash, update the corresponding slot in the scintillator detections matrix.
+                                scintillator.detections[i] += 1 #Update corresponding scintillator array
+                                sipm.flashed = True
+                                print('A SiPM pinged! e')
+                        print('Muon has decayed inside of the array! f')
+
+
+                # 3: Calculate the energy loss due to the stopping power of the array.
                 rho_de_dx = abs(bethe_equation(atomic_no, mass_no, muon1.get_gamma(), muon1.get_beta(), muon1.mass, excitation_energy, rho))
                 de = abs(rho_de_dx * dx)
+
 
                 #Decrease the energy of the muon appropriately
                 muon1.energy -= de
                 muon1.update_gamma()
                 muon1.update_velocity()
+
+                #Update muon rest-frame lifetime, accounting for time dilation
+                muon1.age += 1 / muon1.get_gamma()
+                
         
         elif not in_motion:
             #Muon not in motion! Let's explicitly set the velocity to 0 just in case, though this should have already been taken care of.
@@ -192,6 +253,7 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
                     #Check to see whether the muon now decays
                     if muon1.decays():
                         #The muon has decayed!
+                        muon1.decayed = True
                         if a == 0:
                             print('Error- muon decay not occuring within the matrix d')
                         else:
