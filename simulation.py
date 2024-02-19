@@ -299,17 +299,25 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
     #List of colours
     colors = ['r', 'g', 'b', 'c', 'y', 'k', 'w', 'm']
 
+    max_height = 1
+
     for x in range(array.sipms_per_scintillator):
         #Generate z values for each slice of the detection plane, i.e. for each sipm
         detection_flatten = detection_plane[x, :, :].flatten()
         color1 = colors[x % len(colors)] #Make sure each sipm gets its own color
 
+        if x != 0:
+            height = np.max(detection_plane[x-1,:,:])
+        else:
+            height = 0
+        
+        max_height += height
+
         for i, k, detection in zip(X_flatten, Y_flatten, detection_flatten):
             if detection > 0:
-                ax.bar3d(k, i, x, 1, 1, detection, color=color1, alpha=0.8, label=f'SiPM{x}')
+                ax.bar3d(k, i, height, 1, 1, detection, color=color1, alpha=0.8, label=f'SiPM{x}')
+                
 
-
-    max_height = 2 * array.sipms_per_scintillator #Maximum number of detections if each sipm flashes twice
 
     #3D Bar graph which graphically displays detection events
     plt.ylabel('Horizonal axis (i)')

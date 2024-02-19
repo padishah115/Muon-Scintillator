@@ -16,14 +16,14 @@ rho = 8.96 #density in g/cm^3
 ages = []
 stops = []
 
-for i in range(simulation_number):
-     #Run the simulation a number of times equivalent to the simulation number, each time returning an age
-     age, stopped = run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho)
-     ages.append(age)
-     stops.append(stopped)
+# for i in range(simulation_number):
+#      #Run the simulation a number of times equivalent to the simulation number, each time returning an age
+#      age, stopped = run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho)
+#      ages.append(age)
+#      stops.append(stopped)
 
-print(f'Percentage of muons stopped in array: {percentage_stopped(stops)} % ({number_stopped(stops)} muons total)')
+# print(f'Percentage of muons stopped in array: {percentage_stopped(stops)} % ({number_stopped(stops)} muons total)')
 
-graph_ages(ages)
+# graph_ages(ages)
 
-# run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho)
+run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho)

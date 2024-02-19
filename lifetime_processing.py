@@ -35,7 +35,6 @@ def graph_ages(ages):
 
         bin_width = 0.1
         bins = np.arange(0, max_lifetime + bin_width, bin_width)
-
         frequencies, edges = np.histogram(lifetimes, bins=bins)
         bin_centers = 0.5 * (edges[:-1] + edges[1:])
 
