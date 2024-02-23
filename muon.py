@@ -38,19 +38,22 @@ class Muon:
     #GENERATORS
 
     def generate_position(self):
-        """Generates the initial position of the muon given the velocity."""
+        """Generates the initial position of the muon given the velocity. Current bug: appears to only generate the muon with x = 0 or x = 4"""
         
         if self.velocity[0] > 0 and self.velocity[1] > 0:
+            #Muon comes with positive x velocity and positive y velocity
             i = 0
             j = 0
             k = np.random.randint(0,self.array_dimension)
 
         if self.velocity[0] > 0 and self.velocity[1] < 0:
+            #Muon comes with positive x velocity and negative y velocity
             i = 0
             j = self.array_dimension - 1
             k = np.random.randint(0,self.array_dimension)
         
         if self.velocity[0] < 0 and self.velocity[1] > 0:
+            #Muon comes with 
             i = self.array_dimension - 1
             j = 0
             k = np.random.randint(0,self.array_dimension)
@@ -99,11 +102,7 @@ class Muon:
 
         energies = np.arange(self.mass, self.max_energy, 1) #Energies between 105 MeV and 10000 MeV, increments of 1 MeV
 
-        normalisation_factor = 0
-
-        for e in energies:
-            #Calculate the normalisation factor by summing over energies in the range
-            normalisation_factor += ((4290 + e)**-3.01) * (1 + e/0.854)**-1
+        normalisation_factor = sum(((4290 + e)**-3.01) * (1 + e/0.854)**-1 for e in energies)
 
         ready = False
 

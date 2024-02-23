@@ -5,7 +5,10 @@ from scintillator_label import *
 from bethe_equation import *
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import os
 #import datetime
+
+current_directory = os.getcwd()
 
 def run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, dx=5):
     """Runs the simulation and returns the decayed muon ages (muon age of 0 indicates that the muon did not decay inside of the array), and whether the
@@ -326,7 +329,7 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
     ax.set_xlim(0,array_dimension)
     ax.set_ylim(0,array_dimension)
     ax.set_zlim(0,max_height)
-    plt.savefig(f'detection_bars_energy_{muon1.energy:2f}.png')
+    plt.savefig(current_directory+f'\\bar graphs\detection_bars_energy_{muon1.energy:2f}.png')
     plt.show()
 
     #Plots for all scintillators
@@ -362,6 +365,6 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
                 axs[i,j].tick_params(labelleft=False)
 
     plt.tight_layout()
-    plt.savefig(f'pulse graphs energy {muon1.energy:2f}.png')
+    plt.savefig(current_directory+f'\\Pulse graphs\pulse graphs energy {muon1.energy:2f}.png')
     plt.show()
     

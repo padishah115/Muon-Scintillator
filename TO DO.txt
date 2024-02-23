@@ -1,4 +1,3 @@
 TO DO
 1) Debug muons- why are they only being generated at the extremeties of the array?
-2) Time dilation
 3) Fix energy distribution
