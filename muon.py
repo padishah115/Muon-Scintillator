@@ -13,6 +13,7 @@ class Muon:
         self.max_energy = max_energy #Maximum energy in distribution in MeV
         self.default_energy = 4000 #Default energy in MeV
         self.energies = np.arange(self.minimum_energy, self.max_energy, 1) #Energies between 105 MeV and max MeV, increments of 1 MeV
+        self.position_history = []
 
         #First, generate energy using distribution. Use this to generate gamma. This, in turn, can be used to compute the velocity in natural units
         self.energy = self.generate_energy() #Energy in MeV
@@ -204,6 +205,8 @@ class Muon:
 
     def update_position(self):
         """Updates the position of the particle"""
+        self.position_history.append(self.true_position)
+
         self.true_position = np.add(self.true_position, self.velocity)
         self.position = np.rint(self.true_position).astype(int) #Rounded to better fit in with the quantised array
 

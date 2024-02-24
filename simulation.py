@@ -3,9 +3,8 @@ from array_scintillator_sipm import *
 from muon import Muon
 from scintillator_label import *
 from bethe_equation import *
-from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import os
+from graphing_functions import *
 #import datetime
 
 current_directory = os.getcwd()
@@ -170,8 +169,8 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
     in_motion = False
 
     while t <= tmax:
-        print(f'Position: {muon1.position}')
-        print(f'Velocity: {muon1.velocity}')
+        #print(f'Position: {muon1.true_position}')
+        #print(f'Velocity: {muon1.velocity}')
 
         #Check to see whether the muon is in the array
         in_matrix = muon1.is_contained()
@@ -286,90 +285,8 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
     #RECALL- WE ARE NO LONGER STORING SCINTILLATOR FLASHES WITHIN THE MATRIX ELEMENT. 
     #WE ARE NOW INSTEAD STORING THEM IN A MULTIDIMENSIONAL ARRAY INSIDE OF EACH SCINTILLATOR CLASS
 
-
-    detection_plane = array.return_detection_plane()
-    #print(detection_plane)
-
-    #Generating Meshgrids
-    X, Y = np.meshgrid(np.arange(array_dimension), np.arange(array_dimension))
-    X_flatten = X.flatten()
-    Y_flatten = Y.flatten()
-
-
-    # #Generate 3D graph
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    #List of colours
-    colors = ['r', 'g', 'b', 'c', 'y', 'k', 'w', 'm']
-
-    max_height = 1
-
-    for x in range(array.sipms_per_scintillator):
-        #Generate z values for each slice of the detection plane, i.e. for each sipm
-        detection_flatten = detection_plane[x, :, :].flatten()
-        color1 = colors[x % len(colors)] #Make sure each sipm gets its own color
-
-        if x != 0:
-            height = np.max(detection_plane[x-1,:,:])
-        else:
-            height = 0
-        
-        max_height += height
-
-        for i, k, detection in zip(X_flatten, Y_flatten, detection_flatten):
-            if detection > 0:
-                ax.bar3d(k, i, max_height, 1, 1, detection, color=color1, alpha=0.8, label=f'SiPM{x}')
-                
-
-
-    #3D Bar graph which graphically displays detection events
-    plt.ylabel('Horizonal axis (i)')
-    plt.xlabel('Height (k)')
-    plt.title(f'0 is max height, 5 is bottom of array. Muon energy: {muon1.energy/1000:.2f} GeV')
-    ax.set_xlim(0,array_dimension)
-    ax.set_ylim(0,array_dimension)
-    ax.set_zlim(0,max_height)
-    plt.savefig(current_directory+f'\\bar graphs\detection_bars_energy_{muon1.energy:.2f}.png')
-    plt.show()
-    
-    
-
-    #Plots for all scintillators
-    fig, axs = plt.subplots(array_dimension, array_dimension, figsize = (20, 20))
-
-    x = np.arange(0, tmax+1)
-
-    #List of styles
-    styles = ['-', '--', '-.', ':', ',', 'o', '^']
-
-    #Populate the dim*dim graphs with the signals from each scintillator
-    for i in range(array_dimension):
-         for j in range(array_dimension):
-            #Initialise graph for each scintillator in the array
-            scintillator_index = i*array_dimension + j
-            sipm_number = array.sipms_per_scintillator
-            scintillator = array.scintillators[scintillator_index]
-
-            for k in range(sipm_number):
-                #One plot per scintillator graph per SiPM
-                y = scintillator.sipms[k].detections
-                axs[i,j].plot(x,y, label=f'SiPM {k+1}', color=colors[k % len(colors)], linestyle=styles[k % len(styles)])
-                axs[i,j].legend()
-
-            axs[i,j].set_title(f'{scintillator_index+1}')
-            axs[i,j].set_xlabel('Time')
-
-            if j == 0:
-                #Only add y axis labels to leftmost column in order to conserve space
-                axs[i,j].set_ylabel('Signal Output')
-            if j != 0 :
-                #Remove the ticks from the y axis if the graph is not in the leftmost column
-                axs[i,j].tick_params(labelleft=False)
-
-    plt.tight_layout()
-    plt.savefig(current_directory+f'\\Pulse graphs\pulse graphs energy {muon1.energy:.2f}.png')
-    plt.show()
+    generate_scintillator_graphs(array, muon1, tmax)
+    generate_muon_graph(muon1)
     
     
     
