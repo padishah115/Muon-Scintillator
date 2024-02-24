@@ -13,7 +13,7 @@ class Muon:
         self.max_energy = max_energy #Maximum energy in distribution in MeV
         self.default_energy = 4000 #Default energy in MeV
         self.energies = np.arange(self.minimum_energy, self.max_energy, 1) #Energies between 105 MeV and max MeV, increments of 1 MeV
-        self.position_history = []
+        self.position_history = [] #For use later on in plotting the trajectories
 
         #First, generate energy using distribution. Use this to generate gamma. This, in turn, can be used to compute the velocity in natural units
         self.energy = self.generate_energy() #Energy in MeV
