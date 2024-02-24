@@ -22,6 +22,7 @@ class Muon:
         #Set c = 1
         self.velocity = self.generate_velocity(1) #Returns velocity array 
         self.position = self.generate_position()
+        self.true_position = self.position
         self.theta
 
         
@@ -203,7 +204,8 @@ class Muon:
 
     def update_position(self):
         """Updates the position of the particle"""
-        self.position = np.rint(np.add(self.position, self.velocity)).astype(int)
+        self.true_position = np.add(self.true_position, self.velocity)
+        self.position = np.rint(self.true_position).astype(int) #Rounded to better fit in with the quantised array
 
 
     #LOGIC CHECKERS

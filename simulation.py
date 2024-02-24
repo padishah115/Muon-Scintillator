@@ -319,14 +319,14 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
 
         for i, k, detection in zip(X_flatten, Y_flatten, detection_flatten):
             if detection > 0:
-                ax.bar3d(k, i, height, 1, 1, detection, color=color1, alpha=0.8, label=f'SiPM{x}')
+                ax.bar3d(k, i, max_height, 1, 1, detection, color=color1, alpha=0.8, label=f'SiPM{x}')
                 
 
 
     #3D Bar graph which graphically displays detection events
     plt.ylabel('Horizonal axis (i)')
     plt.xlabel('Height (k)')
-    plt.title(f'0 is max height, 5 is bottom of array. Muon energy: {muon1.energy}')
+    plt.title(f'0 is max height, 5 is bottom of array. Muon energy: {muon1.energy/1000:.2f} GeV')
     ax.set_xlim(0,array_dimension)
     ax.set_ylim(0,array_dimension)
     ax.set_zlim(0,max_height)
