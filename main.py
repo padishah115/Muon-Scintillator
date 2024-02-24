@@ -6,24 +6,16 @@ simulation_number = 500
 #Max time step in each iteration of the simulation
 tmax = 20
 
+#Energy parameters
+max_muon_energy = 10000
+
 array_dimension = 5
 sipms_per_scintillator = 2
-atomic_no = 29
-mass_no = 63.5
+atomic_no = 64
+mass_no = 118.17
 excitation_energy = 3 #In eV, based on light of wavelength 425nm
-rho = 8.96 #density in g/cm^3
+rho = 1.081 #density in g/cm^3
 
-ages = []
-stops = []
+#graph_ages(ages)
 
-# for i in range(simulation_number):
-#      #Run the simulation a number of times equivalent to the simulation number, each time returning an age
-#      age, stopped = run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho)
-#      ages.append(age)
-#      stops.append(stopped)
-
-# print(f'Percentage of muons stopped in array: {percentage_stopped(stops)} % ({number_stopped(stops)} muons total)')
-
-# graph_ages(ages)
-
-run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho)
+run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, max_muon_energy)

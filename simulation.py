@@ -10,7 +10,7 @@ import os
 
 current_directory = os.getcwd()
 
-def run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, dx=5):
+def run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, max_muon_energy, min_muon_energy=200, dx=5):
     """Runs the simulation and returns the decayed muon ages (muon age of 0 indicates that the muon did not decay inside of the array), and whether the
     muon was stopped in the array as a 0 or 1 value"""
 
@@ -20,7 +20,7 @@ def run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mas
     array = Array(array_dimension, sipms_per_scintillator)
 
     #Initialise muon
-    muon1 = Muon(array_dimension)
+    muon1 = Muon(array_dimension, max_muon_energy, min_muon_energy)
 
     in_matrix = False
     in_motion = False
@@ -155,7 +155,7 @@ def run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mas
         return 0, 1
 
 
-def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, dx=5):
+def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, max_muon_energy, min_muon_energy=200, dx=5):
     """Runs the simulation and plots graphs showing detection events for each scintillator"""
 
     t = 0
@@ -164,13 +164,14 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
     array = Array(array_dimension, sipms_per_scintillator)
 
     #Initialise muon
-    muon1 = Muon(array_dimension)
+    muon1 = Muon(array_dimension, max_muon_energy, min_muon_energy)
 
     in_matrix = False
     in_motion = False
 
     while t <= tmax:
-        #print(muon1.position)
+        print(f'Position: {muon1.position}')
+        print(f'Velocity: {muon1.velocity}')
 
         #Check to see whether the muon is in the array
         in_matrix = muon1.is_contained()
@@ -221,7 +222,7 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
                                 scintillator.detections[i] += 1 #Update corresponding scintillator array
                                 sipm.flashed = True
                                 print('A SiPM pinged! e')
-                        print('Muon has decayed inside of the array! f')
+                        print('Muon has decayed inside of the array! f1')
 
 
                 # 3: Calculate the energy loss due to the stopping power of the array.
@@ -267,7 +268,7 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
                                     scintillator.detections[i] += 1 #Update corresponding scintillator array
                                     sipm.flashed = True
                                     print('A SiPM pinged! e')
-                        print('Muon has decayed inside of the array! f')
+                        print('Muon has decayed inside of the array! f2')
                     else:
                         #The muon lives to fight another day. Update his age inside of the matrix
                         muon1.age += 1
@@ -329,8 +330,10 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
     ax.set_xlim(0,array_dimension)
     ax.set_ylim(0,array_dimension)
     ax.set_zlim(0,max_height)
-    plt.savefig(current_directory+f'\\bar graphs\detection_bars_energy_{muon1.energy:2f}.png')
+    plt.savefig(current_directory+f'\\bar graphs\detection_bars_energy_{muon1.energy:.2f}.png')
     plt.show()
+    
+    
 
     #Plots for all scintillators
     fig, axs = plt.subplots(array_dimension, array_dimension, figsize = (20, 20))
@@ -365,6 +368,8 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
                 axs[i,j].tick_params(labelleft=False)
 
     plt.tight_layout()
-    plt.savefig(current_directory+f'\\Pulse graphs\pulse graphs energy {muon1.energy:2f}.png')
+    plt.savefig(current_directory+f'\\Pulse graphs\pulse graphs energy {muon1.energy:.2f}.png')
     plt.show()
+    
+    
     

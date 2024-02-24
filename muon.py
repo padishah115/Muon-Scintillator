@@ -5,12 +5,14 @@ class Muon:
     energy through the array of scintillators. This means we need to calculate the stopping probability
     for the muon at each point in the array"""
 
-    def __init__(self, array_dim):
+    def __init__(self, array_dim, max_energy, min_energy):
         self.array_dimension = array_dim
         self.mass = 206 * 0.511 #Muon mass in MeV
-        self.max_angle_deg = 45 #Maximal zenith angle of the muons in units of degrees
-        self.max_energy = 10000 #Maximum energy in distribution in MeV
+        self.minimum_energy = np.max([self.mass, min_energy])
+        self.max_angle_deg = 90 #Maximal zenith angle of the muons in units of degrees
+        self.max_energy = max_energy #Maximum energy in distribution in MeV
         self.default_energy = 4000 #Default energy in MeV
+        self.energies = np.arange(self.minimum_energy, self.max_energy, 1) #Energies between 105 MeV and max MeV, increments of 1 MeV
 
         #First, generate energy using distribution. Use this to generate gamma. This, in turn, can be used to compute the velocity in natural units
         self.energy = self.generate_energy() #Energy in MeV
@@ -38,58 +40,42 @@ class Muon:
     #GENERATORS
 
     def generate_position(self):
-        """Generates the initial position of the muon given the velocity. Current bug: appears to only generate the muon with x = 0 or x = 4"""
-        
-        if self.velocity[0] > 0 and self.velocity[1] > 0:
-            #Muon comes with positive x velocity and positive y velocity
-            i = 0
-            j = 0
-            k = np.random.randint(0,self.array_dimension)
+        """Generates the initial position of the muon given the velocity. """
+        v_x = self.velocity[0]
+        v_y = self.velocity[1]
+        v_z = self.velocity[2]
 
-        if self.velocity[0] > 0 and self.velocity[1] < 0:
-            #Muon comes with positive x velocity and negative y velocity
-            i = 0
-            j = self.array_dimension - 1
-            k = np.random.randint(0,self.array_dimension)
-        
-        if self.velocity[0] < 0 and self.velocity[1] > 0:
-            #Muon comes with 
-            i = self.array_dimension - 1
-            j = 0
-            k = np.random.randint(0,self.array_dimension)
+        array_dim = self.array_dimension
 
-        if self.velocity[0] < 0 and self.velocity[1] < 0:
-            i = self.array_dimension -1
-            j = self.array_dimension -1 
-            k = np.random.randint(0,self.array_dimension)
+        if abs(v_z) > abs(v_x) and abs(v_z) > abs(v_y):
+            #if the vertical component is largest (this is the most likely case for muons as they have small zenith angles)
+            k = 0 #Generate at the top of the array
+            i = np.random.randint(0,array_dim)
+            j = np.random.randint(0,array_dim)
 
-        if self.velocity[0] == 0 and self.velocity[1] == 0:
-                #Comes from vertically downwards
-                i = np.random.randint(0, self.array_dimension)
-                j = np.random.randint(0, self.array_dimension)
-                k = 0
-        
-        if self.velocity[0] == 0 and self.velocity[1] != 0:
-            if self.velocity[1] > 0:
-                i = np.random.randint(0,self.array_dimension)
-                j = 0
-                k = np.random.randint(0,self.array_dimension)
-            if self.velocity[1] < 0:
-                i = np.random.randint(0,self.array_dimension)
-                j = self.array_dimension - 1
-                k = np.random.randint(0,self.array_dimension)
-
-
-        if self.velocity [0] != 0 and self.velocity[1] == 0:
-            if self.velocity[0] > 0:
-                j = np.random.randint(0,self.array_dimension)
+        elif abs(v_x) > abs(v_y) and abs(v_x) > abs(v_z):
+            if v_x > 0:
                 i = 0
-                k = np.random.randint(0,self.array_dimension)
-            if self.velocity[0] < 0:
-                j = np.random.randint(0,self.array_dimension)
-                i = self.array_dimension - 1
-                k = np.random.randint(0,self.array_dimension)
-        
+                k = np.random.randint(0,array_dim)
+                j = np.random.randint(0,array_dim)
+            elif v_x < 0:
+                i = array_dim - 1
+                j = np.random.randint(0,array_dim)
+                k = np.random.randint(0,array_dim)
+
+        elif abs(v_y) > abs(v_x) and abs(v_y) > abs(v_z):
+            if v_y > 0:
+                j = 0
+                k = np.random.randint(0,array_dim)
+                i = np.random.randint(0,array_dim)
+            elif v_y < 0:
+                j = array_dim - 1
+                i = np.random.randint(0,array_dim)
+                k = np.random.randint(0,array_dim)
+
+        else:
+            print(f'Muon velocity: {self.velocity}')
+            raise ValueError('Invalid velocity direction when generating initial muon position')
 
         return np.array([i,j,k])
     
@@ -100,16 +86,14 @@ class Muon:
 
         energy = self.default_energy #default value is 4000 MeV
 
-        energies = np.arange(self.mass, self.max_energy, 1) #Energies between 105 MeV and 10000 MeV, increments of 1 MeV
-
-        normalisation_factor = sum(((4290 + e)**-3.01) * (1 + e/0.854)**-1 for e in energies)
+        normalisation_factor = sum(((4290 + e)**-3.01) * (1 + e/0.854)**-1 for e in self.energies)
 
         ready = False
 
         while not ready:
-
+            
             chance = np.random.random()
-            energy_choice = np.random.choice(energies) #try random energy from the MeV matrix
+            energy_choice = np.random.choice(self.energies) #try random energy from the MeV matrix
             energy_probability = (1/normalisation_factor) *  (((4290 + energy_choice)**-3.01) * (1 + energy_choice/0.854)**-1) #Calculate probability
 
             if chance <= energy_probability: #Accept reject
@@ -252,3 +236,4 @@ class Muon:
         else:
             self.decayed = True
             return True
+        
