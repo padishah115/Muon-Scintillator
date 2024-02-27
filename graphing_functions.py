@@ -9,10 +9,14 @@ from mpl_toolkits.mplot3d import Axes3D
 current_directory = os.getcwd()
 
 def generate_scintillator_graphs(array, muon, tmax):
+    """This generates the 3D bar graphs which show the pulses from each individual SiPM in the array."""
     array_dimension = array.dimension
     detection_plane = array.return_detection_plane()
 
-    """Produces bar graphs and pulse graphs for the scintillating array"""
+    #########################################################################
+    # BAR GRAPHS, 3D, SHOWING SIGNALS PRODUCED BY SiPMs IN THE ARRAY        #
+    #########################################################################
+    
     #Generating Meshgrids
     X, Y = np.meshgrid(np.arange(array_dimension), np.arange(array_dimension))
     X_flatten = X.flatten()
@@ -56,12 +60,14 @@ def generate_scintillator_graphs(array, muon, tmax):
     plt.savefig(current_directory+f'\\bar graphs\detection_bars_energy_{muon.energy/1000:.2f} GeV.png')
     plt.show()
     
-    
 
-    #Plots for all scintillators
+    #########################################################################
+    # PULSE GRAPHS FOR EACH INDIVIDUAL SCINTILLATOR OUTPUT                  #
+    #########################################################################
+
     fig, axs = plt.subplots(array_dimension, array_dimension, figsize = (20, 20))
 
-    x = np.arange(0, tmax+1)
+    x = np.arange(0, muon.time_in_array)
 
     #List of styles
     styles = ['-', '--', '-.', ':', ',', 'o', '^']
@@ -76,7 +82,7 @@ def generate_scintillator_graphs(array, muon, tmax):
 
             for k in range(sipm_number):
                 #One plot per scintillator graph per SiPM
-                y = scintillator.sipms[k].detections
+                y = scintillator.sipms[k].detections[:muon.time_in_array]
                 axs[i,j].plot(x,y, label=f'SiPM {k+1}', color=colors[k % len(colors)], linestyle=styles[k % len(styles)])
                 axs[i,j].legend()
 
@@ -95,12 +101,30 @@ def generate_scintillator_graphs(array, muon, tmax):
     plt.show()
 
 
-def generate_muon_graph(muon):
+def generate_muon_graph(muon, initial_pos, final_pos):
     """Generates a 3D plot given the muon trajectory through the scintillator"""
     dimension = muon.array_dimension
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
+    
+    ##################################################################################
+    # PLOT INITIAL AND FINAL POSITIONS OF THE MUON DURING PASSAGE THROUGH ARRAY      #
+    ##################################################################################
+
+    #Intial position plus label
+    ax.scatter(initial_pos[2], initial_pos[0], initial_pos[1], color='k')
+    ax.text(initial_pos[2] + 0.1, initial_pos[0] + 0.1, initial_pos[1] +1, f'[{initial_pos[2]:.2f}, {initial_pos[0]:.2f}, {initial_pos[1]:.2f}]', color='blue')
+    
+    #Final position plus label
+    ax.scatter(final_pos[2], final_pos[0], final_pos[1], color='k')
+    ax.text(final_pos[2] + 0.1, final_pos[0] + 0.1, final_pos[1] +1, f'[{final_pos[2]:.2f}, {final_pos[0]:.2f}, {final_pos[1]:.2f}]', color='blue')
+
+
+    #########################################################################
+    # TRAJECTORY LINE FOR MUON PASSING THROUGH THE ARRAY                    #
+    #########################################################################
+
     ax.set_title(f'Muon trajectory through the matrix for energy {muon.energy/1000:.2f} GeV')
 
     crosswise,scintwise,height = zip(*muon.position_history)
@@ -111,6 +135,8 @@ def generate_muon_graph(muon):
     ax.set_xlim(0,dimension)
     ax.set_zlim(0,dimension)
     ax.set_xlabel('Height above ground')
+    ax.set_ylabel('Perpendicular to scint. axis')
+    ax.set_zlabel('Along axis of scint.')
     plt.savefig(current_directory+f'\\trajectories\\trajectory for {muon.energy/1000:.2f} GeV.png')
     plt.show()
 

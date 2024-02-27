@@ -11,7 +11,8 @@ current_directory = os.getcwd()
 
 def run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, max_muon_energy, min_muon_energy=200, dx=5):
     """Runs the simulation and returns the decayed muon ages (muon age of 0 indicates that the muon did not decay inside of the array), and whether the
-    muon was stopped in the array as a 0 or 1 value"""
+    muon was stopped in the array as a 0 or 1 value
+    Note that muon age is no longer being updated once the muon leaves the array"""
 
     t = 0
 
@@ -90,7 +91,7 @@ def run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mas
                 muon1.update_velocity()
 
                 #Update muon rest-frame lifetime, accounting for time dilation
-                muon1.age += 1 / muon1.get_gamma()
+                muon1.age += 0.0001 / muon1.get_gamma()
                 
         
         elif not in_motion:
@@ -125,7 +126,7 @@ def run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mas
                         #print('Muon has decayed inside of the array! f')
                     else:
                         #The muon lives to fight another day. Update his age inside of the matrix
-                        muon1.age += 1
+                        muon1.age += 0.0001
         else:
             print('Error- neither in motion nor not in motion')
 
@@ -235,7 +236,7 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
                 muon1.update_velocity()
 
                 #Update muon rest-frame lifetime, accounting for time dilation
-                muon1.age += 1 / muon1.get_gamma()
+                muon1.age += 0.0001 / muon1.get_gamma()
                 
         
         elif not in_motion:
@@ -270,7 +271,7 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
                         print('Muon has decayed inside of the array! f2')
                     else:
                         #The muon lives to fight another day. Update his age inside of the matrix
-                        muon1.age += 1
+                        muon1.age += 0.0001
         else:
             print('Error- neither in motion nor not in motion')
 
@@ -285,8 +286,12 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
     #RECALL- WE ARE NO LONGER STORING SCINTILLATOR FLASHES WITHIN THE MATRIX ELEMENT. 
     #WE ARE NOW INSTEAD STORING THEM IN A MULTIDIMENSIONAL ARRAY INSIDE OF EACH SCINTILLATOR CLASS
 
+    print(f'Initial position: {muon1.initial_poisiton}')
+    print(f'Final position: {muon1.final_position}')
+    print(f'Time muon spent in array: {muon1.time_in_array}')
     generate_scintillator_graphs(array, muon1, tmax)
-    generate_muon_graph(muon1)
+    #generate_muon_graph(muon1, muon1.initial_poisiton, muon1.final_position)
+    
     
     
     

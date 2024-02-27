@@ -35,8 +35,13 @@ class Muon:
 
         self.distance_travelled_in_array = 1 #At beginning of simulation, all muons have already entered the array and hence travelled 1 block
 
-        self.lifetime = 2.2 #Characteristic decay time
+        self.lifetime = 22000 #Characteristic decay time in 100s of picoseconds
         self.age = 0
+
+        #These are for generating markers at the point of entry and point of exit in the array
+        self.initial_poisiton = self.position #Sets the initial position 
+        self.final_position = self.set_final_position() #Undefined until the muon exits the array
+        self.time_in_array
 
 
     #GENERATORS
@@ -241,4 +246,21 @@ class Muon:
         else:
             self.decayed = True
             return True
-        
+    
+    def set_final_position(self):
+        """Takes the final position as input and updates the final position parameter accordingly"""
+        pos = self.true_position
+        tolerance = 10**-1
+        step_size = 0.01
+
+        ready = False
+        k = 0
+
+        while not ready:
+            pos = np.add(pos, np.multiply(self.velocity, step_size))
+            k += 1
+            for i in range(3):
+                if abs(pos[i] - self.array_dimension) <= tolerance:
+                    self.time_in_array = int(np.ceil(k*step_size))
+                    return pos
+

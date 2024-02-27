@@ -105,6 +105,7 @@ def return_hist(ages):
 
         folding_time = get_folding_time(bin_centers, remaining_muons)
 
+        #Returns the histrogram bin centre points, the number of surviving muons at each point, and the estimate of folding time, tau
         return bin_centers, remaining_muons, folding_time
 
     
