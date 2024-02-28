@@ -13,7 +13,7 @@ class Energy_Distribution:
         """Takes energy values in units of GeV"""
         self.emin = emin
         self.emax = emax
-        self.e_vals = np.linspace(self.emin, self.emax)
+        self.e_vals = np.linspace(self.emin, self.emax, 1000)
         self.p_values = self.get_p_values()
         self.mean = self.get_mean_energy()
         
@@ -41,6 +41,7 @@ class Energy_Distribution:
 
 
 e_min = 0.1 #100 MeV
+
 e_maxes = [i for i in x]
 
 for emax in e_maxes:
@@ -48,22 +49,22 @@ for emax in e_maxes:
     mean = distrib.mean
     means.append(mean)
 
-plt.plot(x, means)
-plt.title(f'Mean Energy as a Function of Maximum Energy. Min Energy: {e_min} GeV')
-plt.xlabel('Max Energy / GeV')
-plt.ylabel('Probability')
-plt.savefig('max_energy_vs_mean.png')
-plt.show()
-
-# def animate(i):
-#     ax.clear()
-#     e_max = e_maxes[i]
-#     distribution1 = Energy_Distribution(e_min, e_max)
-#     distribution1.plot_distribution()
-#     return 0
-
-# anim = animation.FuncAnimation(fig, animate, frames = len(e_maxes), interval = 1000)
-
+# plt.plot(x, means)
+# plt.title(f'Mean Energy as a Function of Maximum Energy. Min Energy: {e_min} GeV')
+# plt.xlabel('Max Energy / GeV')
+# plt.ylabel('Mean Energy / Gev')
+# plt.savefig('max_energy_vs_mean.png')
 # plt.show()
 
-# anim.save('energy_distribution_animation_2.gif')
+def animate(i):
+    ax.clear()
+    e_max = e_maxes[i]
+    distribution1 = Energy_Distribution(e_min, e_max)
+    distribution1.plot_distribution()
+    return 0
+
+anim = animation.FuncAnimation(fig, animate, frames = len(e_maxes), interval = 1000)
+
+plt.show()
+
+anim.save('energy_distribution_animation_2.gif')

@@ -14,9 +14,15 @@ mass_no = 118.17
 excitation_energy = 3 #In eV, based on light of wavelength 425nm
 rho = 1.081 #density in g/cm^3
 
-max_energies = [1000, 2500, 5000, 10000] #Maximum energies for the distribution in units of MeV
+max_energies = [50000, 75000, 100000, 20000] #Maximum energies for the distribution in units of MeV
 master_pop = [] #Maximum lifetimes for each of the max energy values
 
+per_stop = [] 
+
+
+##########################
+# RUNNING THE SIMULATION #
+##########################
 
 for max_e in max_energies:
     ages = []
@@ -26,7 +32,7 @@ for max_e in max_energies:
     styles = ['o', 'v', 's', '*']
     
     for i in range(simulation_number):
-        #Run the simulation a number of times equivalent to the simulation number, each time returning an age and a BOOLEAN as to whether the muon has stopped
+        #Run the simulation a number of times equivalent to the simulation number, each time returning a muon age and a BOOLEAN as to whether the muon has stopped
         age, stopped = run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, max_e)
         ages.append(age)
         stops.append(stopped) #"STOPPED" is a Boolean value, taking 0 for NOT STOPPED and 1 for STOPPED
@@ -42,20 +48,40 @@ for max_e in max_energies:
    
     print(f'Percentage of muons stopped for max energy {max_e/1000} GeV: {percentage_stopped(stops):.2f} % ({number_stopped(stops)} muons total)')
 
+    per_stop.append(percentage_stopped(stops))
+
 print(f'Each simulation ran for {tmax_in_microseconds} microseconds')
 
-x_rest = np.linspace(0, np.max(ages))
-y_rest = rest_lifetimes(x_rest)
 
-#Make sure to rescale the rest-frame curve to keep it in line with the initial maximum population
-plt.plot(x_rest, np.max(master_pop) * y_rest, color='m', label='Expected distribution for muons at rest')
+#########################################################################
+# PLOTS OF MUON POPULATION AGAINST LIFETIME FOR DIFFERENT ENERGY RANGES #
+#########################################################################
 
-plt.xlabel('Lifetime in array / microseconds')
-plt.ylabel('Muon population')
-plt.legend()
-plt.title('Population of muons at different energy ranges in PVT scintillator')
-plt.savefig('Multiple energy maxima.png')
+# x_rest = np.linspace(0, np.max(ages))
+# y_rest = rest_lifetimes(x_rest)
+
+# #Make sure to rescale the rest-frame curve to keep it in line with the initial maximum population
+# plt.plot(x_rest, np.max(master_pop) * y_rest, color='m', label='Expected distribution for muons at rest')
+
+# plt.xlabel('Lifetime in array / microseconds')
+# plt.ylabel('Muon population')
+# plt.legend()
+# plt.title('Population of muons at different energy ranges in PVT scintillator')
+# plt.savefig('Multiple energy maxima.png')
+# plt.show()
+
+############################################################
+# PLOTS OF PERCENTAGE % OF MUONS STOPPED VS MAXIMUM ENERGY #
+############################################################
+
+max_energies_gev = np.multiply(max_energies, 1/1000)
+
+plt.plot(max_energies_gev, per_stop)
+plt.xlabel('Maximum energy in distribution / GeV')
+plt.ylabel('stopped in array %')
+plt.title('Percentage of Muons Stopped in Array As Function of Cutoff Energy')
 plt.show()
+
 
 #graph_ages(ages)
 

@@ -12,7 +12,7 @@ class Muon:
         self.max_angle_deg = 90 #Maximal zenith angle of the muons in units of degrees
         self.max_energy = max_energy #Maximum energy in distribution in MeV
         self.default_energy = 4000 #Default energy in MeV
-        self.energies = np.arange(self.minimum_energy, self.max_energy, 1) #Energies between 105 MeV and max MeV, increments of 1 MeV
+        self.energies = np.linspace(self.minimum_energy, self.max_energy, 1000) #Energies between 105 MeV and max MeV, 1000 samples
         self.position_history = [] #For use later on in plotting the trajectories
 
         #First, generate energy using distribution. Use this to generate gamma. This, in turn, can be used to compute the velocity in natural units
