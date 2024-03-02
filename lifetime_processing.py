@@ -96,7 +96,8 @@ def return_hist(ages):
         max_lifetime = np.max(lifetimes) #Maximum age of muons in the array
 
         bin_width = width
-        bins = np.arange(0, max_lifetime + bin_width, bin_width)
+        #bins = np.arange(0, max_lifetime + bin_width, bin_width)
+        bins = len(ages)
         frequencies, edges = np.histogram(lifetimes, bins=bins)
         bin_centers = 0.5 * (edges[:-1] + edges[1:])
 

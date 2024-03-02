@@ -259,7 +259,7 @@ class Muon:
     def set_final_position(self):
         """Takes the final position as input and updates the final position parameter accordingly"""
         pos = self.true_position
-        tolerance = 10**-1
+        tolerance = 10**-2
         step_size = 0.01
 
         ready = False
