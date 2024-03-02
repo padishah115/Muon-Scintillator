@@ -9,7 +9,7 @@ tmax = 22000
 tmax_in_microseconds = ((tmax*100) * 10 **-12) / (1 * 10**-6) 
 
 #Energy parameters
-max_muon_energy = 10000 #10000 MeV
+max_muon_energy = 150000 #150 GeV
 min_muon_energy = 107 #107 MeV
 
 array_dimension = 5

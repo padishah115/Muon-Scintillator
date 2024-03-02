@@ -1,5 +1,9 @@
 import numpy as np
 
+######################
+# MUON CLASS LIBRARY #
+######################
+
 class Muon:
     """The goal of the simulation is to correctly model the passage of a muon of a particular
     energy through the array of scintillators. This means we need to calculate the stopping probability
@@ -12,7 +16,7 @@ class Muon:
         self.max_angle_deg = 90 #Maximal zenith angle of the muons in units of degrees
         self.max_energy = max_energy #Maximum energy in distribution in MeV
         self.default_energy = 4000 #Default energy in MeV
-        self.energies = np.linspace(self.minimum_energy, self.max_energy, 1000) #Energies between 105 MeV and max MeV, 1000 samples
+        self.energies = np.linspace(self.minimum_energy, self.max_energy, 500) #Energies between 105 MeV and max MeV, 500 samples
         self.position_history = [] #For use later on in plotting the trajectories
 
         #First, generate energy using distribution. Use this to generate gamma. This, in turn, can be used to compute the velocity in natural units
@@ -88,8 +92,13 @@ class Muon:
     
 
     def generate_energy(self):
-        """Generates a random energy between 1 and 10 Gev in steps of 1, using the paper
-        https://arxiv.org/pdf/1606.06907.pdf as my reference"""
+        """Generates a random muon energy between 1 and 10 Gev in steps of 1, using the paper
+        https://arxiv.org/pdf/1606.06907.pdf as my reference for the shape of the energy distribution.
+        
+        The original paper uses an experimental fit for the intensity of muons at different values of energy.
+
+        I have used the shape of this intensity plot and used a normalisation proceduce below to turn this into a probability density.
+        """
 
         energy = self.default_energy #default value is 4000 MeV
 
@@ -112,7 +121,7 @@ class Muon:
 
     def calculate_theta(self):
         """The muon cosmic ray spectrum is proportional to cos^2(theta)
-        This function generates values of zenith angle, theta, given this distribution
+        This function generates values of zenith angle, theta, given this distribution, using an accept-reject method.
         """
 
         ready = False #We keep looping until we beat the game of chance

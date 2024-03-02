@@ -1,3 +1,5 @@
+#RETURNS THE LABEL OF THE SCINTILLATOR WHICH THE MUON IS CURRENTLY LOCATED IN, BASED ON THE POSITION ARRAY OF THE MUON
+
 def get_scintillator_label(position, array_dimension):
     """LABELLING THE SCINTILLATOR WHICH THE MUON IS IN in order to append the detection event to the correct scintillator"""
     x = position[0]

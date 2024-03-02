@@ -35,6 +35,6 @@ plt.plot(x, cos_2x_norm, label='Cos^2x, Normalised')
 plt.scatter(bin_centers, y, color='r', label='Randomly Generated Theta Values')
 plt.legend()
 plt.title('Randomly generated angles against Cos^2x Graph')
-plt.savefig(f'{current_directory}\\angular_distribution_graphs\\angular_distrib_graph_{bin_no}_bins.png')
+plt.savefig(f'angular_distrib_graph_{bin_no}_bins.png')
 plt.show()
 
