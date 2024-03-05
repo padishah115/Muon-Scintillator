@@ -4,6 +4,8 @@ import numpy as np
 # MUON CLASS LIBRARY #
 ######################
 
+t= np.linspace(0,10,1000)
+
 class Muon:
     """The goal of the simulation is to correctly model the passage of a muon of a particular
     energy through the array of scintillators. This means we need to calculate the stopping probability
@@ -39,8 +41,9 @@ class Muon:
 
         self.distance_travelled_in_array = 1 #At beginning of simulation, all muons have already entered the array and hence travelled 1 block
 
-        self.lifetime = 22000 #Characteristic decay time in 100s of picoseconds
+        self.lifetime = 22000 #Characteristic decay time in microseconds
         self.age = 0
+        self.timestep = 1
 
         #These are for generating markers at the point of entry and point of exit in the array
         self.initial_poisiton = self.position #Sets the initial position 
@@ -177,9 +180,13 @@ class Muon:
 
     def get_gamma(self):
         
-        e = self.energy #Energy in MeV
-        m = self.mass #Muon Mass in MeV
-        gamma = e / m
+        if self.energy >= self.mass:
+            e = self.energy #Energy in MeV
+            m = self.mass #Muon Mass in MeV
+            gamma = e / m
+        
+        else:
+            gamma = 1
 
         return gamma
     
@@ -224,6 +231,13 @@ class Muon:
         self.true_position = np.add(self.true_position, self.velocity)
         self.position = np.rint(self.true_position).astype(int) #Rounded to better fit in with the quantised array
 
+    def update_energy(self, de):
+        if self.energy - de > self.mass:
+            self.energy = self.energy - de
+        else:
+            self.energy = self.mass
+            self.velocity = np.array([0,0,0])
+
 
     #LOGIC CHECKERS
         #Is the muon contained in the matrix?
@@ -248,13 +262,15 @@ class Muon:
     def decays(self):
         """Check to see whether the muon decays given its age. If it has decayed, set "decayed" to true"""
         chance = np.random.random()
-        exp = np.exp(-self.age / self.lifetime)
+        exp = np.exp(-self.timestep / self.lifetime)
 
-        if chance < exp:
-            return False
-        else:
+        if chance > exp:
             self.decayed = True
+            self.decay_exp = exp
+            self.chance = chance
             return True
+        
+        return False
     
     def set_final_position(self):
         """Takes the final position as input and updates the final position parameter accordingly"""
