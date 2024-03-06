@@ -4,13 +4,13 @@ from lifetime_processing import *
 #Number of times the simulation is run
 simulation_number = 500
 #Max time step in each iteration of the simulation- tmax in 100s of picoseconds
-tmax = 22000
+tmax = 100000
 
 tmax_in_microseconds = ((tmax*100) * 10 **-12) / (1 * 10**-6) 
 
 #Energy parameters
 max_muon_energy = 150000 #150 GeV
-min_muon_energy = 107 #107 MeV
+min_muon_energy = 110 #107 MeV
 
 array_dimension = 5
 sipms_per_scintillator = 2

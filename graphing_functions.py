@@ -51,13 +51,14 @@ def generate_scintillator_graphs(array, muon, tmax):
 
 
     #3D Bar graph which graphically displays detection events
-    plt.ylabel('Horizonal axis (i)')
-    plt.xlabel('Height (k)')
-    plt.title(f'0 is max height, 5 is bottom of array. Muon energy: {muon.energy/1000:.2f} GeV')
+    plt.ylabel('Horizonal axis')
+    plt.xlabel('Height off ground')
+    plt.title(f'Graph of SiPM signals. Muon energy: {muon.energy/1000:.2f} GeV')
+    ax.set_zlabel('SiPM pulse number')
     ax.set_xlim(0,array_dimension)
     ax.set_ylim(0,array_dimension)
-    ax.set_zlim(0,max_height)
-    plt.savefig(current_directory+f'\\bar graphs\detection_bars_energy_{muon.energy/1000:.2f} GeV.png')
+    ax.set_zlim(0,max_height*2)
+    #plt.savefig(current_directory+f'\\bar graphs\detection_bars_energy_{muon.energy/1000:.2f} GeV.png')
     plt.show()
     
 
@@ -97,7 +98,7 @@ def generate_scintillator_graphs(array, muon, tmax):
                 axs[i,j].tick_params(labelleft=False)
 
     plt.tight_layout()
-    plt.savefig(current_directory+f'\\Pulse graphs\pulse graphs energy {muon.energy/1000:.2f} GeV.png')
+    #plt.savefig(current_directory+f'\\Pulse graphs\pulse graphs energy {muon.energy/1000:.2f} GeV.png')
     plt.show()
 
 
@@ -137,7 +138,54 @@ def generate_muon_graph(muon, initial_pos, final_pos):
     ax.set_xlabel('Height above ground')
     ax.set_ylabel('Perpendicular to scint. axis')
     ax.set_zlabel('Along axis of scint.')
-    plt.savefig(current_directory+f'\\trajectories\\trajectory for {muon.energy/1000:.2f} GeV.png')
+    #plt.savefig(current_directory+f'\\trajectories\\trajectory for {muon.energy/1000:.2f} GeV.png')
     plt.show()
+
+def generate_muon_graph_with_scintillators(muon, initial_pos, final_pos):
+    """Generates a 3D plot given the muon trajectory through the scintillator"""
+    dimension = muon.array_dimension
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    
+    ##################################################################################
+    # PLOT INITIAL AND FINAL POSITIONS OF THE MUON DURING PASSAGE THROUGH ARRAY      #
+    ##################################################################################
+
+    #Intial position plus label
+    ax.scatter(initial_pos[2], initial_pos[0], initial_pos[1], color='k')
+    #ax.text(initial_pos[2] + 0.1, initial_pos[0] + 0.1, initial_pos[1] +1, f'[{initial_pos[2]:.1f}, {initial_pos[0]:.1f}, {initial_pos[1]:.1f}]', color='blue')
+    
+    #Final position plus label
+    ax.scatter(final_pos[2], final_pos[0], final_pos[1], color='k')
+    #ax.text(final_pos[2] + 0.1, final_pos[0] + 0.1, final_pos[1] +1, f'[{final_pos[2]:.1f}, {final_pos[0]:.1f}, {final_pos[1]:.1f}]', color='blue')
+
+
+    #########################################################################
+    # TRAJECTORY LINE FOR MUON PASSING THROUGH THE ARRAY                    #
+    #########################################################################
+
+    ax.set_title(f'Muon trajectory through the matrix for energy {muon.energy/1000:.2f} GeV')
+
+    crosswise,scintwise,height = zip(*muon.position_history)
+
+    ax.plot3D(height, crosswise, scintwise, color='m')
+
+    colors = ['black', 'dimgray']
+
+    for i in range(dimension):
+        for j in range(dimension):
+            color_index = (i+j) % 2
+            ax.bar3d(i, j, 0, 1, 1, dimension, color=colors[color_index], edgecolor='w', alpha=0.01)
+
+    ax.set_ylim(0,dimension)
+    ax.set_xlim(0,dimension)
+    ax.set_zlim(0,dimension)
+    ax.set_xlabel('Height above ground')
+    ax.set_ylabel('Perpendicular to scint. axis')
+    ax.set_zlabel('Along axis of scint.')
+    #plt.savefig(current_directory+f'\\trajectories\\trajectory for {muon.energy/1000:.2f} GeV.png')
+    plt.show()
+
 
 

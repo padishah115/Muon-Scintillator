@@ -276,7 +276,7 @@ class Muon:
         """Takes the final position as input and updates the final position parameter accordingly"""
         pos = self.true_position
         tolerance = 1e-2
-        step_size = 0.01
+        step_size = 0.001
 
         ready = False
         k = 0
@@ -287,5 +287,7 @@ class Muon:
             for i in range(3):
                 if abs(pos[i] - self.array_dimension) <= tolerance:
                     self.time_in_array = int(np.ceil(k*step_size))
+                    return pos
+                elif pos[i] <= -1 * tolerance:
                     return pos
 

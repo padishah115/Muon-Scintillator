@@ -322,6 +322,7 @@ def run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomi
     print(f'Time muon spent in array: {muon1.time_in_array}')
     graphing_functions.generate_scintillator_graphs(array, muon1, tmax)
     graphing_functions.generate_muon_graph(muon1, muon1.initial_poisiton, muon1.final_position)
+    graphing_functions.generate_muon_graph_with_scintillators(muon1, muon1.initial_poisiton, muon1.final_position)
     
     
     

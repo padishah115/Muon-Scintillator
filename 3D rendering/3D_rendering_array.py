@@ -10,10 +10,10 @@ dimension = 5
 height = 1
 colors = ['black', 'dimgray']
 
-for i in range(5):
-    for j in range(5):
+for i in range(dimension):
+    for j in range(dimension):
         color_index = (i+j) % 2
-        ax.bar3d(i, 0, j, 1, 1, 1, color=colors[color_index], edgecolor='w')
+        ax.bar3d(i, j, 0, 1, 1, 1, color=colors[color_index], edgecolor='w')
 
 ax.set_zlabel('Height above ground')
 ax.set_xticks([])
