@@ -11,7 +11,7 @@ array_dim = 5
 max_energy = 10000 #10 GeV
 min_energy = 107 #106 Mev- rest mass
 
-bin_no = 20
+bin_no = 100
 
 step = 0.01
 
@@ -31,10 +31,10 @@ integral = np.trapz(cos_2x, x)
 bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
 cos_2x_norm = cos_2x / integral
 
-plt.plot(x, cos_2x_norm, label='Cos^2x, Normalised')
-plt.scatter(bin_centers, y, color='r', label='Randomly Generated Theta Values')
+plt.plot(x, cos_2x_norm, label='Cos^2(x) PDF, normalised')
+plt.scatter(bin_centers, y, color='r', label=f'Randomly Generated Theta Values, {bin_no} quantisation bins')
 plt.legend()
-plt.title('Randomly generated angles against Cos^2x Graph')
+plt.title(f'Simulation probability density function for zenith angle, {muon_number} muons')
 plt.savefig(f'angular_distrib_graph_{bin_no}_bins.png')
 plt.show()
 

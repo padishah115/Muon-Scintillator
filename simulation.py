@@ -9,6 +9,9 @@ import graphing_functions
 
 current_directory = os.getcwd()
 
+if __name__ == '__main__':
+    print('Accessing simulation')
+
 def run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, max_muon_energy, min_muon_energy=200, dx=5):
     """Runs the simulation and returns the decayed muon ages, and whether the
     muon was stopped in the array as a 0 or 1 value

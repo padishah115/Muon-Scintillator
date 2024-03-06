@@ -4,7 +4,7 @@ import numpy as np
 # MUON CLASS LIBRARY #
 ######################
 
-t= np.linspace(0,10,1000)
+#t= np.linspace(0,10,1000)
 
 class Muon:
     """The goal of the simulation is to correctly model the passage of a muon of a particular
@@ -275,7 +275,7 @@ class Muon:
     def set_final_position(self):
         """Takes the final position as input and updates the final position parameter accordingly"""
         pos = self.true_position
-        tolerance = 10**-2
+        tolerance = 1e-2
         step_size = 0.01
 
         ready = False

@@ -114,11 +114,11 @@ def generate_muon_graph(muon, initial_pos, final_pos):
 
     #Intial position plus label
     ax.scatter(initial_pos[2], initial_pos[0], initial_pos[1], color='k')
-    ax.text(initial_pos[2] + 0.1, initial_pos[0] + 0.1, initial_pos[1] +1, f'[{initial_pos[2]:.2f}, {initial_pos[0]:.2f}, {initial_pos[1]:.2f}]', color='blue')
+    ax.text(initial_pos[2] + 0.1, initial_pos[0] + 0.1, initial_pos[1] +1, f'[{initial_pos[2]:.1f}, {initial_pos[0]:.1f}, {initial_pos[1]:.1f}]', color='blue')
     
     #Final position plus label
     ax.scatter(final_pos[2], final_pos[0], final_pos[1], color='k')
-    ax.text(final_pos[2] + 0.1, final_pos[0] + 0.1, final_pos[1] +1, f'[{final_pos[2]:.2f}, {final_pos[0]:.2f}, {final_pos[1]:.2f}]', color='blue')
+    ax.text(final_pos[2] + 0.1, final_pos[0] + 0.1, final_pos[1] +1, f'[{final_pos[2]:.1f}, {final_pos[0]:.1f}, {final_pos[1]:.1f}]', color='blue')
 
 
     #########################################################################
