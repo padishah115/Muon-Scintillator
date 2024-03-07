@@ -7,7 +7,7 @@ sigma_eff = 0.05 #Standard deviation of the efficiencies of the SiPMs
 class Array:
         """Generates a square matrix of appropriate dimension for the muons to travel through. Takes the array dimension as an input."""
 
-        def __init__(self, dimension, sipms_per_scintillator):
+        def __init__(self, dimension, sipms_per_scintillator, dead_time_sipms_ns):
             
             #array dimension
             self.dimension = dimension 
@@ -17,6 +17,9 @@ class Array:
 
             #Number of SiPMs to be put in each scintillator
             self.sipms_per_scintillator = sipms_per_scintillator
+
+            #Dead time of SiPMs nanoseconds
+            self.dead_time_sipms_ns = dead_time_sipms_ns
             
             #Gives us the array representation as a cubic matrix
             self.matrix = self.initialise_matrix() 
@@ -39,7 +42,7 @@ class Array:
             scintillator_list = []
 
             for i in range(self.scintillator_no):
-                  scintillator_list.append(Scintillator(self.sipms_per_scintillator))
+                  scintillator_list.append(Scintillator(self.dead_time_sipms_ns, self.sipms_per_scintillator))
 
             return scintillator_list
         
@@ -82,22 +85,25 @@ class Array:
 class Scintillator:
     """Scintillator Class. Takes, as arguments, the no. of SiPMs in each scintillator."""
 
-    def __init__(self, sipm_per_scintillator = 1):
+    def __init__(self, dead_time_sipms_ns, sipm_per_scintillator = 1):
+        """Takes the dead time of SiPMs in ns and the number of sipms per scintillator as arguments"""
         #Default number of SiPMs per scintillator is 1
 
         self.sipm_per_scintillator = sipm_per_scintillator
+        self.dead_time_sipms_ns = dead_time_sipms_ns
 
         self.sipms = self.initialise_sipms()
 
         #Creates an array, which tracks the number of detections per SiPM per scintillator
         self.detections = np.zeros((sipm_per_scintillator, 1))
         
+        
 
     def initialise_sipms(self):
         sipms = []
 
         for i in range(self.sipm_per_scintillator):
-             sipms.append(SIPM())
+             sipms.append(SIPM(self.dead_time_sipms_ns))
 
         return sipms
     
@@ -114,14 +120,18 @@ class Scintillator:
 class SIPM:
     """SiPM class with associated quantum efficiency and photoelectron modes. Also probabilistically generates an efficiency for each SiPM"""
     
-    def __init__(self):
+    def __init__(self, dead_time_ns):
+        """Takes the dead time in ns as an argument"""
         #Quantum efficiency of the SiPM
         self.efficiency = self.generate_efficiency() 
 
         #Detection list to be plotted against time
         self.detections = [] 
+        
 
         self.flashed = False
+        self.dead_time = (dead_time_ns * 10**-9) / (100*10**-12)
+        self.last_flashed_time = 0
 
     
     def generate_efficiency(self):
@@ -133,10 +143,16 @@ class SIPM:
 
         return eff
     
-    def caught_light(self):
+    def caught_light(self, t):
         """Checks to see whether the SiPM catches the light of the scintillator."""
         chance = np.random.random()
-        if chance < self.efficiency:
+        if self.last_flashed_time == 0:
+             #First flash
+             self.last_flashed_time = t
+             return True
+        if chance < self.efficiency and t - self.last_flashed_time > self.dead_time and self.last_flashed_time !=0:
+             #Not the first flash
+             self.last_flashed_time = t
              return True
         else:
              return False

@@ -13,7 +13,7 @@ import lifetime_processing as life
 """
 
 #Number of muons per run of simulation. Each simulation generates muons up to and including a certain energy value.
-muon_number = 100
+muon_number = 10
 #Max time step in each iteration of the simulation
 tmax = 100000 #Time in 100s of picoseconds. 44000 * 100 picoseconds = 4.4 microseconds
 tmax_in_microseconds = ((tmax*100) * 10 **-12) / (1 * 10**-6) #Converting explicitly to microseconds
@@ -24,10 +24,12 @@ atomic_no = 64
 mass_no = 118.17
 excitation_energy = 3 #In eV, based on light of wavelength 425nm
 rho = 1.081 #density in g/cm^3
+plot = False #Don't want to plot
+dead_time_sipms_ns = 10 #Dead time of the SiPMs in nanoseconds
 
 #ENERGY RANGES
-min_energies =  np.arange(110, 290, 20) #Minimum energies for the energy distribution in MeV
-max_energies = np.add(min_energies, 10) #Maximum energies for the distribution in units of MeV. Muons are generated with energies between rest mass and this value
+min_energies =  [110] #Minimum energies for the energy distribution in MeV
+max_energies = [200] #Maximum energies for the distribution in units of MeV. Muons are generated with energies between rest mass and this value
 
 #Maximum lifetimes for each of the different simulation runs.
 init_pops = [] 
@@ -47,12 +49,12 @@ for j, max_e in enumerate(max_energies):
     ages = [] #Ages of muons of those which have decayed. Muons which have not decayed will not have their values appended.
     stops = [] #For each generated muon, it will either stop or not stop. If it has stopped, a value of 1 is appened to the array. Otherwise, 0 is appended.
 
-    colors = ['r', 'g', 'b', 'm', 'y', 'k', 'c']
+    colors = ['r', 'g', 'm', 'y', 'k', 'c']
     styles = ['o', 'v', 's', '*']
     
     for i in range(muon_number):
         #Run the simulation a number of times equivalent to the simulation number, each time returning a muon age and a BOOLEAN as to whether the muon has stopped
-        age, stopped = sim.run_simulation(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, max_e, min_muon_energy=min_e)
+        age, stopped = sim.run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, sipms_per_scintillator, atomic_no, mass_no, excitation_energy, rho, max_e, min_muon_energy=min_e)
         if age != 0:
             ages.append(age)
         stops.append(stopped) #"STOPPED" is a Boolean value, taking 0 for NOT STOPPED and 1 for STOPPED
@@ -98,8 +100,8 @@ x_rest = np.linspace(0, 100000, 1000)
 y_rest = life.rest_lifetimes(x_rest) #Expected graph for muons at rest
 
 #Make sure to rescale the rest-frame curve to keep it in line with the initial maximum population
-# for init_pop in init_pops:
-#     plt.scatter(x_rest, init_pop*y_rest, color='b')
+for init_pop in init_pops:
+    plt.scatter(x_rest, init_pop*y_rest, color='b', marker='x', s=0.15, label='Expected population')
 
 plt.xlabel('Lifetime in array / microseconds')
 plt.ylabel('Muon population')

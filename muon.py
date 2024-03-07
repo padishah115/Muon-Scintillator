@@ -30,7 +30,7 @@ class Muon:
         self.velocity = self.generate_velocity(1) #Returns velocity array 
         self.position = self.generate_position()
         self.true_position = self.position
-        self.theta
+        self.theta = 0
 
         
 
@@ -46,9 +46,10 @@ class Muon:
         self.timestep = 1
 
         #These are for generating markers at the point of entry and point of exit in the array
+        self.time_in_array = 0 
         self.initial_poisiton = self.position #Sets the initial position 
         self.final_position = self.set_final_position() #Undefined until the muon exits the array
-        self.time_in_array
+        
 
 
     #GENERATORS

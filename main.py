@@ -18,8 +18,10 @@ atomic_no = 64
 mass_no = 118.17
 excitation_energy = 3 #In eV, based on light of wavelength 425nm
 rho = 1.081 #density in g/cm^3
+dead_time_sipms_ns = 10 #10 ns dead time for sipms
+plot=True
 
 #graph_ages(ages)
 
-run_simulation_and_plot(tmax, sipms_per_scintillator, array_dimension, atomic_no, mass_no, excitation_energy, rho, max_muon_energy)
+run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_time_sipms_ns, atomic_no, mass_no, excitation_energy, rho, max_muon_energy)
 print(f'Simulation ran for {tmax_in_microseconds} microseconds')
