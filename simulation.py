@@ -12,8 +12,10 @@ current_directory = os.getcwd()
 if __name__ == '__main__':
     print('Accessing simulation')
 
-def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_time_sipms_ns, atomic_no, mass_no, excitation_energy, rho, max_muon_energy, min_muon_energy=200, dx=5):
-    """Runs the simulation and plots graphs showing detection events for each scintillator"""
+def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_time_sipms_ns, atomic_no, mass_no, excitation_energy, rho, max_muon_energy, min_muon_energy=200):
+    """Runs the simulation and plots graphs showing detection events for each scintillator. Dx is the distance travelled in each timestep in cm."""
+
+    tmax_in_microseconds = ((tmax*100) * 10 **-12) / (1 * 10**-6)
 
     t = 0
 
@@ -91,6 +93,11 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
                     #print('e')
                     #Update muon rest-frame lifetime, accounting for time dilation
                     muon1.age = muon1.age + (1 / muon1.get_gamma())
+
+                    beta = muon1.get_beta()
+
+                    #Incremental distance in cm. If the speed is c, the distance travelled is 3cm
+                    dx = 3 * beta
 
                     # 3: Calculate the energy loss due to the stopping power of the array.
                     rho_de_dx = abs(bethe.bethe_equation(atomic_no, mass_no, muon1.get_gamma(), muon1.get_beta(), muon1.mass, excitation_energy, rho))

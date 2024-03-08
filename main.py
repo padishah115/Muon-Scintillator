@@ -4,7 +4,7 @@ from lifetime_processing import *
 #Number of times the simulation is run
 simulation_number = 500
 #Max time step in each iteration of the simulation- tmax in 100s of picoseconds
-tmax = 100000
+tmax = 1000000
 
 tmax_in_microseconds = ((tmax*100) * 10 **-12) / (1 * 10**-6) 
 

@@ -1,6 +1,6 @@
 import numpy as np
 
-mean_efficiency = 0.8 #Modal/median/mean efficiency of the SiPMs
+mean_efficiency = 0.8 #Modal/median/mean photon detection efficiency of the SiPMs
 sigma_eff = 0.05 #Standard deviation of the efficiencies of the SiPMs
 
 
