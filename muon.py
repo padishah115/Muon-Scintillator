@@ -29,7 +29,6 @@ class Muon:
         #Set c = 1
         self.velocity = self.generate_velocity(1) #Returns velocity array 
         self.position = self.generate_position()
-        self.true_position = self.position
         self.theta = 0
 
         
@@ -227,11 +226,11 @@ class Muon:
 
     def update_position(self):
         """Updates the position of the particle"""
-        self.position_history.append(self.true_position)
+        self.position_history.append(self.position)
 
-        self.true_position = np.add(self.true_position, self.velocity)
-        self.position = np.rint(self.true_position).astype(int) #Rounded to better fit in with the quantised array
-
+        self.position = np.add(self.position, self.velocity)
+        
+    
     def update_energy(self, de):
         if self.energy - de > self.mass:
             self.energy = self.energy - de
@@ -275,7 +274,7 @@ class Muon:
     
     def set_final_position(self):
         """Takes the final position as input and updates the final position parameter accordingly"""
-        pos = self.true_position
+        pos = self.position
         tolerance = 1e-2
         step_size = 0.001
 
@@ -288,6 +287,7 @@ class Muon:
             for i in range(3):
                 if abs(pos[i] - self.array_dimension) <= tolerance:
                     self.time_in_array = int(np.ceil(k*step_size))
+                    self.position_history.append(pos)
                     return pos
                 elif pos[i] <= -1 * tolerance:
                     return pos

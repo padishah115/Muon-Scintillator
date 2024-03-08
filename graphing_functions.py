@@ -8,7 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 current_directory = os.getcwd()
 
-def generate_scintillator_graphs(array, muon, tmax):
+def generate_scintillator_graphs(array, muon):
     """This generates the 3D bar graphs which show the pulses from each individual SiPM in the array."""
     array_dimension = array.dimension
     detection_plane = array.return_detection_plane()

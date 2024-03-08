@@ -36,8 +36,8 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
         #Check to see whether the muon has decayed
         decayed = muon1.decayed
         #Determines which scintillator was triggered.
-        a = scintillator_label.get_scintillator_label(muon1.position, array_dimension) 
-        scintillator_index = a - 1
+        scintillator_index = scintillator_label.get_scintillator_index(muon1) 
+        
         #Reset all sipms to FALSE for flashed
         array.reset_SIPMS()
 
@@ -53,7 +53,7 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
                 #Muon is in motion and INSIDE the array.
                 
                 # 1: Check to see whether the SiPMs in the current scintillator detect the light or not
-                if a == 0:
+                if scintillator_index < 0:
                     print('Error- muon said to be inside matrix but returning scintillator label outside of the matrix')
                     #print('b')
                 else:
@@ -75,7 +75,7 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
                     print(muon1.chance)
                     #The muon has decayed!
                     muon1.decayed = True
-                    if a == 0:
+                    if scintillator_index < 0:
                             print('Error- muon decay not occuring within the matrix d')
                     else:
                         scintillator = array.scintillators[scintillator_index] #This calls the relevant scintillator object
@@ -126,7 +126,7 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
                         #print(muon1.chance)
                         #The muon has decayed!
                         muon1.decayed = True
-                        if a == 0:
+                        if scintillator_index < 0:
                             print('Error- muon decay not occuring within the matrix d')
                         else:
                             scintillator = array.scintillators[scintillator_index] #This calls the relevant scintillator object
@@ -152,14 +152,17 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
 
         t = t + 1
 
+    if muon1.decayed:
+        print('Muon has decayed inside of the matrix.')
+
     if plot:
         #RECALL- WE ARE NO LONGER STORING SCINTILLATOR FLASHES WITHIN THE MATRIX ELEMENT. 
         #WE ARE NOW INSTEAD STORING THEM IN A MULTIDIMENSIONAL ARRAY INSIDE OF EACH SCINTILLATOR CLASS
-
+        print(muon1.position_history)
         print(f'Initial position: {muon1.initial_poisiton}')
         print(f'Final position: {muon1.final_position}')
         print(f'Time muon spent in array: {muon1.time_in_array}')
-        graphing_functions.generate_scintillator_graphs(array, muon1, tmax)
+        graphing_functions.generate_scintillator_graphs(array, muon1)
         graphing_functions.generate_muon_graph(muon1, muon1.initial_poisiton, muon1.final_position)
         graphing_functions.generate_muon_graph_with_scintillators(muon1, muon1.initial_poisiton, muon1.final_position)
     else:

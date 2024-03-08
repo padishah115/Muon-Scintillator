@@ -148,7 +148,7 @@ class SIPM:
         chance = np.random.random()
         if self.last_flashed_time == 0:
              #First flash
-             self.last_flashed_time = t
+             self.last_flashed_time = t+1e-5 #Prevents edge case of flash occuring at t = 0 and then last_flashed time being set to 0
              return True
         if chance < self.efficiency and t - self.last_flashed_time > self.dead_time and self.last_flashed_time !=0:
              #Not the first flash
