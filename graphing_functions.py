@@ -188,4 +188,10 @@ def generate_muon_graph_with_scintillators(muon, initial_pos, final_pos):
     plt.show()
 
 
+# def generate_OR_plot():
+#     """Generates graph of SiPMs using OR combination logic"""
+    
+# def generate_AND_plot():
+#     """Generates graph of SiPMs using AND combination logic"""
+
 

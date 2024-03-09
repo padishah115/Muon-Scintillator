@@ -172,6 +172,11 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
         graphing_functions.generate_scintillator_graphs(array, muon1)
         graphing_functions.generate_muon_graph(muon1, muon1.initial_poisiton, muon1.final_position)
         graphing_functions.generate_muon_graph_with_scintillators(muon1, muon1.initial_poisiton, muon1.final_position)
+
+        #Produce graphs of the scintillator hits with different logic.
+        # graphing_functions.generate_OR_plot()
+        # graphing_functions.generate_AND_plot()
+
     else:
         #RETURN VALUES OF THE SIMULATION:
         #Two values returned: the age (float) and whether the muon was stopped (boolean)
