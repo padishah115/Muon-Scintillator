@@ -66,9 +66,12 @@ def generate_scintillator_graphs(array, muon):
     # PULSE GRAPHS FOR EACH INDIVIDUAL SCINTILLATOR OUTPUT                  #
     #########################################################################
 
+    #Extra time after muon exits the array for which the graphs are still plotted
+    excess_time = 5
+
     fig, axs = plt.subplots(array_dimension, array_dimension, figsize = (20, 20))
 
-    x = np.arange(0, muon.time_in_array)
+    x = np.arange(0, muon.time_in_array + excess_time)
 
     #List of styles
     styles = ['-', '--', '-.', ':', ',', 'o', '^']
@@ -83,7 +86,7 @@ def generate_scintillator_graphs(array, muon):
 
             for k in range(sipm_number):
                 #One plot per scintillator graph per SiPM
-                y = scintillator.sipms[k].detections[:muon.time_in_array]
+                y = scintillator.sipms[k].detections[:muon.time_in_array + excess_time]
                 axs[i,j].plot(x,y, label=f'SiPM {k+1}', color=colors[k % len(colors)], linestyle=styles[k % len(styles)])
                 axs[i,j].legend()
 
@@ -191,7 +194,32 @@ def generate_muon_graph_with_scintillators(muon, initial_pos, final_pos):
 # def generate_OR_plot():
 #     """Generates graph of SiPMs using OR combination logic"""
     
-# def generate_AND_plot():
-#     """Generates graph of SiPMs using AND combination logic"""
+def generate_AND_plot(array):
+    """Generates graph of SiPMs using AND combination logic"""
+
+    #Use the array method which returns the appropriate detection plane
+    detection_array_and = array.return_AND_detection_plane()
+    dimension = array.dimension
+
+    X, Y = np.meshgrid(np.arange(dimension), np.arange(dimension))
+    X_flatten = X.flatten()
+    Y_flatten = Y.flatten()
+    detection_flatten = detection_array_and.flatten()
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    for i, k, detection in zip(X_flatten, Y_flatten, detection_flatten):
+        if detection > 0:
+            ax.bar3d(k, i, 0, 1, 1, detection, color='b', alpha = 0.8)
+    
+    plt.ylabel('Horizontal axis')
+    plt.xlabel('Height off ground')
+    ax.set_zlabel('Along scintillator axis')
+    plt.title('Signals From Each Scint. for SiPMs used in AND config.')
+    ax.set_xlim(0, dimension)
+    ax.set_ylim(0, dimension)
+    ax.set_zlim(0, 10)
+    plt.show()
 
 

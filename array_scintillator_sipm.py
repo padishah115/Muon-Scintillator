@@ -46,10 +46,13 @@ class Array:
 
             return scintillator_list
         
+        ####################
+        # DETECTION PLANES #
+        ####################
+                
         def return_detection_plane(self):
             """This function should return a multidimensional array. Each slice in the x-direction should be the SiPM counts from a different scintillator."""
             
-            #Index 3 enumerates the SIPMS in each scintillator
             detection_array = np.zeros((self.sipms_per_scintillator, self.dimension, self.dimension))
 
             for i in range(self.dimension):
@@ -61,6 +64,35 @@ class Array:
 
             return detection_array
         
+        # def return_OR_detection_plane(self):
+        #     """Returns signals from the array if SiPMs used in conjunction with OR logic"""
+        #     detection_array_OR = np.zeros((self.dimension, self.dimension))
+            
+        #     for i in range(self.dimension):
+        #          for j in range(self.dimension):
+        #               index = i*self.dimension + j
+        #               if self.scintillators[index].any_sipms_flashed():
+        #                    detection_array_OR[i][j] += 1
+
+        #     return detection_array_OR    
+
+        
+        def return_AND_detection_plane(self):
+            """Returns signals for the array if SiPMs used in conjucntion with AND logic"""
+            detection_array_and = np.zeros((self.dimension, self.dimension))
+            
+            for i in range(self.dimension):
+                 for j in range(self.dimension):
+                      index = i*self.dimension + j
+                      detection_array_and[i][j] += self.scintillators[index].AND_sipms_flashed()
+
+            return detection_array_and
+
+
+        ################
+        # SIPM METHODS #
+        ################
+
         def reset_SIPMS(self):
              """Resets all SIPMS to unflashed state"""
              for scintillator in self.scintillators:
@@ -82,6 +114,9 @@ class Array:
 
 
 
+
+
+
 class Scintillator:
     """Scintillator Class. Takes, as arguments, the no. of SiPMs in each scintillator."""
 
@@ -97,7 +132,6 @@ class Scintillator:
         #Creates an array, which tracks the number of detections per SiPM per scintillator
         self.detections = np.zeros((sipm_per_scintillator, 1))
         
-        
 
     def initialise_sipms(self):
         sipms = []
@@ -107,14 +141,18 @@ class Scintillator:
 
         return sipms
     
-    def get_detections_or(self):
-        """Uses or logic to see whether any of the SiPMs in the scintillator have produced a positive signal"""
-
-        if any(self.detections):
-             return True
-        else:
-             return False
-         
+    def AND_sipms_flashed(self):
+        """Returns number of events for which at least two sipms flashed"""
+        event_no = 0
+        for sipm1 in self.sipms: 
+             flash_times1 = sipm1.flash_times
+             for sipm2 in self.sipms:
+                  flash_times2 = sipm2.flash_times
+                  for time1 in flash_times1:
+                       for time2 in flash_times2:
+                            if time1 == time2:
+                                 event_no = event_no + 1
+        return event_no
 
 
 class SIPM:
@@ -130,6 +168,11 @@ class SIPM:
         
 
         self.flashed = False
+
+        #Stores time and location at which the SiPM flashed. This is for use in generating and/or graphs
+        self.flash_times = []
+        
+        
         self.dead_time = (dead_time_ns * 10**-9) / (100*10**-12)
         self.last_flashed_time = 0
 

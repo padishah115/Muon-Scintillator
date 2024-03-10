@@ -66,6 +66,7 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
                                     #If the SIPM caught the signal from the scintillator flash, update the corresponding slot in the scintillator detections matrix.
                                     scintillator.detections[i] += 1
                                     sipm.flashed = True
+                                    sipm.flash_times.append(t)
                                     #print('A SiPM pinged! d')
                                     
 
@@ -76,7 +77,6 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
                     print(muon1.decay_exp)
                     print(muon1.chance)
                     #The muon has decayed!
-                    muon1.decayed = True
                     if scintillator_index < 0:
                             print('Error- muon decay not occuring within the matrix d')
                     else:
@@ -86,6 +86,7 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
                                 #If the SIPM caught the signal from the scintillator flash, update the corresponding slot in the scintillator detections matrix.
                                 scintillator.detections[i] += 1 #Update corresponding scintillator array
                                 sipm.flashed = True
+                                sipm.flash_times.append(t)
                                 #print('A SiPM pinged! e')
                         #print('Muon has decayed inside of the array! f')
 
@@ -113,6 +114,8 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
             #print('f')
             #Muon not in motion! Let's explicitly set the velocity to 0 just in case, though this should have already been taken care of.
             muon1.velocity = np.array([0,0,0])
+            muon1.final_position = muon1.position
+            muon1.recalculate_trajectory()
             
             if not in_matrix:
                 #Should be impossible: muon shouldn't be stationary outside the matrix
@@ -142,6 +145,7 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
                                     #If the SIPM caught the signal from the scintillator flash, update the corresponding slot in the scintillator detections matrix.
                                     scintillator.detections[i] += 1 #Update corresponding scintillator array
                                     sipm.flashed = True
+                                    sipm.flash_times.append(t)
                                     #print('A SiPM pinged! f')
                         #print('Muon has decayed inside of the array! f')
                     else:
@@ -175,7 +179,7 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
 
         #Produce graphs of the scintillator hits with different logic.
         # graphing_functions.generate_OR_plot()
-        # graphing_functions.generate_AND_plot()
+        graphing_functions.generate_AND_plot(array)
 
     else:
         #RETURN VALUES OF THE SIMULATION:

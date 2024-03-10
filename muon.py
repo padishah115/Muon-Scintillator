@@ -266,6 +266,7 @@ class Muon:
 
         if chance > exp:
             self.decayed = True
+            self.velocity = np.array([0,0,0])
             self.decay_exp = exp
             self.chance = chance
             return True
@@ -292,3 +293,7 @@ class Muon:
                 elif pos[i] <= -1 * tolerance:
                     return pos
 
+    def recalculate_trajectory(self):
+        self.position_history = []
+        self.position_history.append(self.initial_poisiton)
+        self.position_history.append(self.final_position)

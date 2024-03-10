@@ -13,9 +13,9 @@ import lifetime_processing as life
 """
 
 #Number of muons per run of simulation. Each simulation generates muons up to and including a certain energy value.
-muon_number = 50
+muon_number = 15
 #Max time step in each iteration of the simulation
-tmax = 1000000 #Time in 100s of picoseconds. 44000 * 100 picoseconds = 4.4 microseconds
+tmax = 100000 #Time in 100s of picoseconds. 44000 * 100 picoseconds = 4.4 microseconds
 tmax_in_microseconds = ((tmax*100) * 10 **-12) / (1 * 10**-6) #Converting explicitly to microseconds
 
 array_dimension = 5
@@ -31,7 +31,7 @@ plot = False #Don't want to plot
 dead_time_sipms_ns = 10 #Dead time of the SiPMs in nanoseconds
 
 #ENERGY RANGES
-min_energies =  np.arange(110, 190, 10) #Minimum energies for the energy distribution in MeV
+min_energies =  np.arange(110, 290, 10) #Minimum energies for the energy distribution in MeV
 max_energies = np.add(10, min_energies) #Maximum energies for the distribution in units of MeV. Muons are generated with energies between rest mass and this value
 
 #Maximum lifetimes for each of the different simulation runs.
@@ -82,6 +82,7 @@ for j, max_e in enumerate(max_energies):
         times, pop = life.plot_reduced_samples_no_tau(ages)
         init_pops.append(np.max(y))
         plt.plot(x,y, label=f'Energy Range: {min_e}-{max_e} MeV', color = np.random.choice(colors))
+        print(f'Percentage of muons stopped for {min_e}-{max_e} MeV: {life.percentage_stopped(stops):.2f} % ({life.number_stopped(stops)} muons total)')
 
     else:
         print(f'No muons stopped for energy range {min_e}-{max_e} MeV')
@@ -99,19 +100,19 @@ print(f'Each simulation ran for {tmax_in_microseconds} simulated microseconds')
 
 #Check that the dimensions of the master_population array is the same as the max_energies array
 
-# x_rest = np.linspace(0, 100000, 1000)
-# y_rest = life.rest_lifetimes(x_rest) #Expected graph for muons at rest
+x_rest = np.linspace(0, 100000, 1000)
+y_rest = life.rest_lifetimes(x_rest) #Expected graph for muons at rest
 
-# #Make sure to rescale the rest-frame curve to keep it in line with the initial maximum population
-# for init_pop in init_pops:
-#     plt.scatter(x_rest, init_pop*y_rest, color='b', marker='x', s=0.15, label='Expected population')
+#Make sure to rescale the rest-frame curve to keep it in line with the initial maximum population
+for init_pop in init_pops:
+    plt.scatter(x_rest, init_pop*y_rest, color='b', marker='x', s=0.15, label='Expected population')
 
-# plt.xlabel('Lifetime in array / microseconds')
-# plt.ylabel('Muon population')
-# plt.legend()
-# plt.title(f'Muon Population Decay, {len(ages)} decayed muons')
-# #plt.savefig('Multiple energy maxima.png')
-# plt.show()
+plt.xlabel('Lifetime in array / microseconds')
+plt.ylabel('Muon population')
+plt.legend()
+plt.title(f'Muon Population Decay')
+#plt.savefig('Multiple energy maxima.png')
+plt.show()
 
 #################################################################
 # PLOTS OF PERCENTAGE % OF MUONS STOPPED VS MAXIMUM ENERGY      #
@@ -135,6 +136,6 @@ plt.xlabel('Energy Range / MeV')
 plt.ylabel('Stopped in array %')
 plt.ylim(0,100)
 plt.xticks(rotation=90)
-plt.title(f'Percentage of Muons Stopped of {muon_number} Muons')
+plt.title(f'Percentage of Muons Stopped of {muon_number} Muons. Sim. Length: {tmax_in_microseconds} us')
 #plt.savefig('stopped_in_array.png')
 plt.show()

@@ -1,10 +1,7 @@
-import numpy as np
+list1 = [1,2,3,4]
+list2 = [1,2,3,4]
 
-matrix = np.zeros((2,5,5))
-
-position = np.array([1,2,3])
-
-print(np.max(position))
-
-for i, num in enumerate(position):
-    print(f'{i} {num}')
+if list1 == list2:
+    print('True')
+else:
+    print('False')
