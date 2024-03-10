@@ -1,7 +1,8 @@
-list1 = [1,2,3,4]
-list2 = [1,2,3,4]
+class Mom:
+    def __init__(self, name):
+        self.name = name
 
-if list1 == list2:
+mom1 = Mom('Hi')
+
+if mom1 == mom1:
     print('True')
-else:
-    print('False')

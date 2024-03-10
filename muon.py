@@ -259,7 +259,7 @@ class Muon:
         else:
             return False
         
-    def decays(self):
+    def decays(self, t):
         """Check to see whether the muon decays given its age. If it has decayed, set "decayed" to true"""
         chance = np.random.random()
         exp = np.exp(-self.timestep / self.lifetime)
@@ -269,6 +269,7 @@ class Muon:
             self.velocity = np.array([0,0,0])
             self.decay_exp = exp
             self.chance = chance
+            self.time_in_array = t
             return True
         
         return False

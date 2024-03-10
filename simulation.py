@@ -72,7 +72,7 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
 
                 # 2: Check chance of decay
                 
-                if muon1.decays():
+                if muon1.decays(t):
                     #print('d')
                     print(muon1.decay_exp)
                     print(muon1.chance)
@@ -130,7 +130,7 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
 
                 else:
                     #Check to see whether the muon now decays
-                    if muon1.decays():
+                    if muon1.decays(t):
                         #print('h')
                         #print(muon1.decay_exp)
                         #print(muon1.chance)
@@ -172,7 +172,7 @@ def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_tim
         print(muon1.position_history)
         print(f'Initial position: {muon1.initial_poisiton}')
         print(f'Final position: {muon1.final_position}')
-        print(f'Time muon spent in array: {muon1.time_in_array}')
+        print(f'Time muon spent in array: {(muon1.time_in_array + 1)*100}ps')
         graphing_functions.generate_scintillator_graphs(array, muon1)
         graphing_functions.generate_muon_graph(muon1, muon1.initial_poisiton, muon1.final_position)
         graphing_functions.generate_muon_graph_with_scintillators(muon1, muon1.initial_poisiton, muon1.final_position)

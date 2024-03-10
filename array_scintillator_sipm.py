@@ -144,14 +144,17 @@ class Scintillator:
     def AND_sipms_flashed(self):
         """Returns number of events for which at least two sipms flashed"""
         event_no = 0
-        for sipm1 in self.sipms: 
-             flash_times1 = sipm1.flash_times
-             for sipm2 in self.sipms:
-                  flash_times2 = sipm2.flash_times
-                  for time1 in flash_times1:
-                       for time2 in flash_times2:
+
+        for i, sipm1 in enumerate(self.sipms):
+             for j, sipm2 in enumerate(self.sipms):
+                flash_times1 = sipm1.flash_times
+                flash_times2 = sipm2.flash_times
+                if i < j:    
+                    for time1 in flash_times1:
+                        for time2 in flash_times2:
                             if time1 == time2:
-                                 event_no = event_no + 1
+                                event_no = event_no + 1
+        
         return event_no
 
 

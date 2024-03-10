@@ -219,7 +219,7 @@ def generate_AND_plot(array):
     plt.title('Signals From Each Scint. for SiPMs used in AND config.')
     ax.set_xlim(0, dimension)
     ax.set_ylim(0, dimension)
-    ax.set_zlim(0, 10)
+    ax.set_zlim(0, 5)
     plt.show()
 
 
