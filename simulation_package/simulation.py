@@ -1,10 +1,12 @@
 import numpy as np
-import array_scintillator_sipm as arr
-from muon import Muon
-import scintillator_label
-import bethe_equation as bethe
 import os
-import graphing_functions
+import matplotlib.pyplot as plt
+
+import simulation_package.array_scintillator_sipm as arr
+from simulation_package.muon import Muon
+import simulation_package.scintillator_label as scintillator_label
+import simulation_package.bethe_equation as bethe
+import simulation_package.graphing_functions as graphing_functions
 #import datetime
 
 current_directory = os.getcwd()

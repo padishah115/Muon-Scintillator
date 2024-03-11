@@ -18,7 +18,7 @@ class Muon:
         self.max_angle_deg = 90 #Maximal zenith angle of the muons in units of degrees
         self.max_energy = max_energy #Maximum energy in distribution in MeV
         self.default_energy = 4000 #Default energy in MeV
-        self.energies = np.linspace(self.minimum_energy, self.max_energy, 500) #Energies between 105 MeV and max MeV, 500 samples
+        self.energies = np.linspace(self.minimum_energy, self.max_energy, 10000)
         self.position_history = [] #For use later on in plotting the trajectories
 
         #First, generate energy using distribution. Use this to generate gamma. This, in turn, can be used to compute the velocity in natural units
@@ -105,9 +105,7 @@ class Muon:
         I have used the shape of this intensity plot and used a normalisation proceduce below to turn this into a probability density.
         """
 
-        energy = self.default_energy #default value is 4000 MeV
-
-        normalisation_factor = sum(((4290 + e)**-3.01) * (1 + e/0.854)**-1 for e in self.energies)
+        normalisation_factor = np.sum(((4290 + self.energies)**-3.01) * (1 + self.energies/0.854)**-1)
 
         ready = False
 

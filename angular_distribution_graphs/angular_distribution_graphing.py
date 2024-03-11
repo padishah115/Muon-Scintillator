@@ -1,4 +1,4 @@
-from muon import Muon
+from simulation_package.muon import Muon
 import numpy as np
 import matplotlib.pyplot as plt
 

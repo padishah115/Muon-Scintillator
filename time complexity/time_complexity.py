@@ -1,6 +1,7 @@
-from simulation import *
-from lifetime_processing import *
+import simulation_package.simulation as simulation 
 import time
+import matplotlib.pyplot as plt
+import numpy as np
 
 ###################################
 # Measurements of Time Complexity #
@@ -45,10 +46,9 @@ def fit_N_order_polynomial(x, y, n):
     return polynomial
 
 
-
 for tmax in tmaxs:
     start_time = time.time()
-    run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_time_sipms_ns, atomic_no, mass_no, excitation_energy, rho, max_muon_energy)
+    simulation.run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_time_sipms_ns, atomic_no, mass_no, excitation_energy, rho, max_muon_energy)
     end_time = time.time()
 
     #Calculate the time taken to execute the simulation for each value of tmax
@@ -73,3 +73,7 @@ plt.ylabel('Real computation time / seconds')
 plt.title(f'Sim. Complexity. Muon Energy:{min_muon_energy/1000}-{max_muon_energy/1000} GeV')
 plt.legend()
 plt.show()
+
+data = np.column_stack((tmaxs_microseconds, times_taken))
+
+np.savetxt('time_complexity.csv', data, delimiter=',')

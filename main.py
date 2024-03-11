@@ -1,6 +1,5 @@
-from simulation import *
-from lifetime_processing import *
-import time
+import simulation_package.simulation as simulation
+
 
 #Number of times the simulation is run
 simulation_number = 500
@@ -24,5 +23,5 @@ plot=True
 
 #graph_ages(ages)
 
-run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_time_sipms_ns, atomic_no, mass_no, excitation_energy, rho, max_muon_energy)
+simulation.run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_time_sipms_ns, atomic_no, mass_no, excitation_energy, rho, max_muon_energy)
 print(f'Simulation ran for {tmax_in_microseconds} microseconds')

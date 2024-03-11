@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #Import simulation library governing the passage and behaviour of muons in the scintillating array, including time dilation etc.
-import simulation as sim
+import simulation_package.simulation as sim
 
 #Library designed to produce useful graphs from the data returned by the simulation code.
-import lifetime_processing as life
+import simulation_package.lifetime_processing as life
 
 """
                 PLOTS OF LIFETIME OF MUONS IN ARRAY AS A FUNCTION OF ENERGY IN THE ENERGY DISTRIBUTION- RANGING FROM MIN TO MAX ENERGY
