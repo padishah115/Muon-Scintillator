@@ -24,12 +24,14 @@ class Muon:
         #First, generate energy using distribution. Use this to generate gamma. This, in turn, can be used to compute the velocity in natural units
         self.energy = self.generate_energy() #Energy in MeV
         self.gamma = self.get_gamma()
+
+        self.theta = 0
         
         #Mean muon energy is 4GeV, meaning v is about c
         #Set c = 1
         self.velocity = self.generate_velocity(1) #Returns velocity array 
         self.position = self.generate_position()
-        self.theta = 0
+        
 
         
 
@@ -136,7 +138,7 @@ class Muon:
             c2 = (np.cos(theta_random))**2
             chance = np.random.random()
             
-            if chance < c2 and theta_random < self.max_angle_deg/180 * np.pi: #reject anything above 45 degrees, as this is when cos^2 drops to 1/4
+            if chance < c2 and theta_random < self.max_angle_deg/180 * np.pi: #reject anything above max angle attribute
                 theta = theta_random
                 ready = True #we are ready to exit
 

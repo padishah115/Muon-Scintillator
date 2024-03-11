@@ -1,5 +1,6 @@
 from simulation import *
 from lifetime_processing import *
+import time
 
 #Number of times the simulation is run
 simulation_number = 500
