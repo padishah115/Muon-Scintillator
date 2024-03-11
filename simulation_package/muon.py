@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 ######################
 # MUON CLASS LIBRARY #
@@ -13,11 +14,17 @@ class Muon:
 
     def __init__(self, array_dim, max_energy, min_energy):
         self.array_dimension = array_dim
-        self.mass = 206 * 0.511 #Muon mass in MeV
+        
+        #Muon mass in MeV
+        self.mass = 206 * 0.511
+
+        #Setting limits of energy distribution in MeV
         self.minimum_energy = np.max([self.mass, min_energy])
+        self.max_energy = max_energy
+
         self.max_angle_deg = 90 #Maximal zenith angle of the muons in units of degrees
-        self.max_energy = max_energy #Maximum energy in distribution in MeV
-        self.default_energy = 4000 #Default energy in MeV
+
+        #Rane of energies in MeV
         self.energies = np.linspace(self.minimum_energy, self.max_energy, 10000)
         self.position_history = [] #For use later on in plotting the trajectories
 
@@ -50,7 +57,6 @@ class Muon:
         self.time_in_array = 0 
         self.initial_poisiton = self.position #Sets the initial position 
         self.final_position = self.set_final_position() #Undefined until the muon exits the array
-        
 
 
     #GENERATORS
@@ -105,21 +111,26 @@ class Muon:
         I have used the shape of this intensity plot and used a normalisation proceduce below to turn this into a probability density.
         """
 
-        normalisation_factor = np.sum(((4290 + self.energies)**-3.01) * (1 + self.energies/0.854)**-1)
+        energies_gev = np.multiply(self.energies, 1/1000)
+
+        normalisation_factor = np.sum(((4.290 + energies_gev)**-3.01) * (1 + energies_gev/854)**-1)
 
         ready = False
 
         while not ready:
             
             chance = np.random.random()
-            energy_choice = np.random.choice(self.energies) #try random energy from the MeV matrix
-            energy_probability = (1/normalisation_factor) *  (((4290 + energy_choice)**-3.01) * (1 + energy_choice/0.854)**-1) #Calculate probability
+            energy_choice = np.random.choice(energies_gev) #try random energy from the MeV matrix
+            energy_probability = (1/normalisation_factor) *  (((4.290 + energy_choice)**-3.01) * (1 + energy_choice/854)**-1) #Calculate probability
 
             if chance <= energy_probability: #Accept reject
                 energy = energy_choice
                 ready = True
 
-        return energy
+        #Return energy in MeV
+        energy_mev = energy * 1000
+
+        return energy_mev
     
 
     def calculate_theta(self):

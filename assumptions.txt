@@ -1,3 +1,0 @@
-Assumptions:
-    Assume that the scintillator always interacts with the moving particles, whether these be electrons or muons.
-    The only thing stopping photons from being detected by the SiPMs is the Photon Detection Efficiency (currently coded at about 0.8)

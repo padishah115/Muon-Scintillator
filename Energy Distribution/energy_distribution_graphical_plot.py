@@ -37,25 +37,29 @@ class Energy_Distribution:
         ax.set_xlabel('Energy / GeV')
         ax.set_ylabel('Probability of Energy')
         plt.title(f'Energy Probability Function. Min: {self.emin:.2f} GeV. Max: {self.emax:.2f} GeV')
+        plt.show()
         
 
+energy_dist = Energy_Distribution(0.110, 300)
+energy_dist.plot_distribution()
 
-e_min = 0.1 #100 MeV
 
-e_maxes = [i for i in x]
+# e_min = 0.1 #100 MeV
 
-for emax in e_maxes:
-    distrib = Energy_Distribution(e_min, emax)
-    mean = distrib.mean
-    means.append(mean)
+# e_maxes = [i for i in x]
 
-plt.plot(x, means)
-plt.yticks(np.arange(np.min(means), np.max(means), 0.5))
-plt.title(f'Mean Energy as a Function of Maximum Energy. Min Energy: {e_min} GeV')
-plt.xlabel('Max Energy / GeV')
-plt.ylabel('Mean Energy / Gev')
-plt.savefig('max_energy_vs_mean.png')
-plt.show()
+# for emax in e_maxes:
+#     distrib = Energy_Distribution(e_min, emax)
+#     mean = distrib.mean
+#     means.append(mean)
+
+# plt.plot(x, means)
+# plt.yticks(np.arange(np.min(means), np.max(means), 0.5))
+# plt.title(f'Mean Energy as a Function of Maximum Energy. Min Energy: {e_min} GeV')
+# plt.xlabel('Max Energy / GeV')
+# plt.ylabel('Mean Energy / Gev')
+# #plt.savefig('max_energy_vs_mean.png')
+# plt.show()
 
 # def animate(i):
 #     ax.clear()
