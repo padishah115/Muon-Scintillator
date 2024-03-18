@@ -12,10 +12,54 @@ import simulation_package.graphing_functions as graphing_functions
 current_directory = os.getcwd()
 
 if __name__ == '__main__':
-    print('Accessing simulation')
+    print('Directly Accessing SImulation File')
 
-def run_simulation(plot, tmax, sipms_per_scintillator, array_dimension, dead_time_sipms_ns, atomic_no, mass_no, excitation_energy, rho, max_muon_energy, min_muon_energy=200):
-    """Runs the simulation and plots graphs showing detection events for each scintillator. Dx is the distance travelled in each timestep in cm."""
+def run_simulation(plot:bool, tmax:int, sipms_per_scintillator:int, array_dimension:int, dead_time_sipms_ns:int, 
+                   atomic_no:float, mass_no:float, excitation_energy:float, rho:float, max_muon_energy:float, min_muon_energy:float=200.):
+    """Runs the simulation and plots graphs showing detection events for each scintillator. Each simulation calculates the passage of a single muon through a 
+    scintillating array.
+
+        ARGS:
+            ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            plot (boolean): If Plot=True, then the simulation will return plots of the muon trajectory through the scintillating array, as well as bar graphs showing
+            number of pulses produced by the silicon photomultipliers (SIPMs) inside of the scintillating apparatus. A second SiPM graph is produced for SiPMs working 
+            in AND configuration, i.e. returning TRUE if any two of the SiPMs fire simultaneously.
+        
+            tmax (integer): The maximum simulated time in units of 100ps. The simulation's finest degree of granularity is on this order, which was decided based on the 
+            dimensions ofthe apparatus (100s of cm) and typical values of the muon trajectory.
+
+            array_dimension (integer): The number of rows/columns in the scintillating apparatus. For example, a value of 5 produces a 5x5 scintillating apparatus.
+
+            dead_time_ns (integer): The dead time of the SiPMs in nanoseconds. This encodes the time for which, after firing, the SiPMs are incapable of producing 
+            another signal. This mimicks real life, wherein the SiPMs have a finite time of recovery (dead time) before they are able to register further photon detections.
+        
+            atomic_no (float): Atomic number of the scintillating material.
+            
+            mass_no (float): Mass number of the scintillating material.
+
+            excitation_energy (float): Excitation energy of the scintillating material in eV as the muon passes through. Can be calculated from the peak
+            emission wavelength.
+
+            rho (float): The density of the scintillating apparatus in g cm-3
+
+            Max_muon_energy (float): The maximum possible energy of the generated muon in MeV
+            
+            Min_muon_energy (float): The minimum possible energy of the generated muon in MeV. This shouldn't be below the rest mass of the muon, but the muon class has a
+            safety net in place to make sure that it can't be generated with an energy lower than its rest mass.
+        
+            
+        RETURNS:
+            ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            if plot=True:
+                muon_age (float) and stopped (bool)
+                muon_age encodes the rest-frame lifetime of the muon at the point of decay
+                stopped is a boolean encoding whether or not the muon was stopped within the array
+
+            if plot=False:
+                no return values. Simply produces the aforementioned plots.
+            
+
+        """
 
     tmax_in_microseconds = ((tmax*100) * 10 **-12) / (1 * 10**-6)
 

@@ -19,7 +19,6 @@ angles = []
 #Stores the energy in MeV
 energies = []
 
-
 #Generate some values of muon angle and energy
 for i in range(muon_number):
     muon1 = muon.Muon(array_dim, max_energy, min_energy)

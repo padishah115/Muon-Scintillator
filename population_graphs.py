@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 #Import simulation library governing the passage and behaviour of muons in the scintillating array, including time dilation etc.
 import simulation_package.simulation as sim
@@ -13,7 +14,7 @@ import simulation_package.lifetime_processing as life
 """
 
 #Number of muons per run of simulation. Each simulation generates muons up to and including a certain energy value.
-muon_number = 15
+muon_number = 1000
 #Max time step in each iteration of the simulation
 tmax = 100000 #Time in 100s of picoseconds. 44000 * 100 picoseconds = 4.4 microseconds
 tmax_in_microseconds = ((tmax*100) * 10 **-12) / (1 * 10**-6) #Converting explicitly to microseconds
@@ -48,6 +49,8 @@ for j, max_e in enumerate(max_energies):
     #OVERALL LOOP FOR EACH MAX ENERGY VALUE
 
     min_e = min_energies[j]
+
+    print(f'{min_e}-{max_e} MeV')
 
     ages = [] #Ages of muons of those which have decayed. Muons which have not decayed will not have their values appended.
     stops = [] #For each generated muon, it will either stop or not stop. If it has stopped, a value of 1 is appened to the array. Otherwise, 0 is appended.
@@ -90,6 +93,12 @@ for j, max_e in enumerate(max_energies):
     #Calculates which percentage of muons were stopped using values in the 'stops' array
     percent_stopped.append(life.percentage_stopped(stops))
 
+    if len(ages) > 0:
+        ages_array = np.column_stack((ages))
+    if len(stops) > 0:
+        stops_array = np.column_stack((stops))
+    np.savetxt(f'C:\\Users\\hayde\\Desktop\\Muon Scintillator\\stop_and_pop_data\\stops\\{min_e}_{max_e}MeV_stops.csv', stops_array, delimiter=',')
+    np.savetxt(f'C:\\Users\\hayde\\Desktop\\Muon Scintillator\\stop_and_pop_data\\ages\\{min_e}_{max_e}MeV_ages.csv', ages_array, delimiter=',')
 
 print(f'Each simulation ran for {tmax_in_microseconds} simulated microseconds')
 
@@ -100,12 +109,12 @@ print(f'Each simulation ran for {tmax_in_microseconds} simulated microseconds')
 
 #Check that the dimensions of the master_population array is the same as the max_energies array
 
-x_rest = np.linspace(0, 100000, 1000)
+x_rest = np.linspace(0, tmax, 1000)
 y_rest = life.rest_lifetimes(x_rest) #Expected graph for muons at rest
 
 #Make sure to rescale the rest-frame curve to keep it in line with the initial maximum population
-for init_pop in init_pops:
-    plt.scatter(x_rest, init_pop*y_rest, color='b', marker='x', s=0.15, label='Expected population')
+for i, init_pop in enumerate(init_pops):
+    plt.scatter(x_rest, init_pop*y_rest, color='b', marker='x', s=0.15)
 
 plt.xlabel('Lifetime in array / microseconds')
 plt.ylabel('Muon population')
@@ -139,3 +148,4 @@ plt.xticks(rotation=90)
 plt.title(f'Percentage of Muons Stopped of {muon_number} Muons. Sim. Length: {tmax_in_microseconds} us')
 #plt.savefig('stopped_in_array.png')
 plt.show()
+
