@@ -94,11 +94,11 @@ for j, max_e in enumerate(max_energies):
     percent_stopped.append(life.percentage_stopped(stops))
 
     if len(ages) > 0:
-        ages_array = np.column_stack((ages))
+        ages_dataframe = pd.DataFrame({'ages in 100ps':ages})
+        ages_dataframe.to_csv(f'C:\\Users\\hayde\\Desktop\\Muon Scintillator\\stop_and_pop_data\\ages\\{min_e}_{max_e}MeV_ages.csv', index=False)
     if len(stops) > 0:
-        stops_array = np.column_stack((stops))
-    np.savetxt(f'C:\\Users\\hayde\\Desktop\\Muon Scintillator\\stop_and_pop_data\\stops\\{min_e}_{max_e}MeV_stops.csv', stops_array, delimiter=',')
-    np.savetxt(f'C:\\Users\\hayde\\Desktop\\Muon Scintillator\\stop_and_pop_data\\ages\\{min_e}_{max_e}MeV_ages.csv', ages_array, delimiter=',')
+        stops_dataframe = pd.DataFrame({'stops boolean':stops})
+        stops_dataframe.to_csv(f'C:\\Users\\hayde\\Desktop\\Muon Scintillator\\stop_and_pop_data\\stops\\{min_e}_{max_e}MeV_stops.csv', index=False)
 
 print(f'Each simulation ran for {tmax_in_microseconds} simulated microseconds')
 
