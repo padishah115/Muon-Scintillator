@@ -44,22 +44,27 @@ energy_dist = Energy_Distribution(0.110, 300)
 energy_dist.plot_distribution()
 
 
-# e_min = 0.1 #100 MeV
+e_min = 0.105266
 
-# e_maxes = [i for i in x]
+e_maxes = [i for i in x]
 
-# for emax in e_maxes:
-#     distrib = Energy_Distribution(e_min, emax)
-#     mean = distrib.mean
-#     means.append(mean)
+for emax in e_maxes:
+     distrib = Energy_Distribution(e_min, emax)
+     mean = distrib.mean
+     means.append(mean)
 
-# plt.plot(x, means)
-# plt.yticks(np.arange(np.min(means), np.max(means), 0.5))
-# plt.title(f'Mean Energy as a Function of Maximum Energy. Min Energy: {e_min} GeV')
-# plt.xlabel('Max Energy / GeV')
-# plt.ylabel('Mean Energy / Gev')
-# #plt.savefig('max_energy_vs_mean.png')
-# plt.show()
+desired_mean = np.full_like(x, 4)
+
+plt.plot(x, means)
+plt.plot(x, desired_mean, label='4 GeV', ls='--', color='r')
+plt.yticks(np.arange(1.5, 5, 0.5))
+plt.title(f'Mean Energy as a Function of Maximum Energy. \n Min Energy: {e_min} GeV')
+plt.xlabel('Max Energy / GeV')
+plt.ylabel('Mean Energy / Gev')
+plt.legend()
+#plt.grid(True)
+#plt.savefig('max_energy_vs_mean.png')
+plt.show()
 
 # def animate(i):
 #     ax.clear()

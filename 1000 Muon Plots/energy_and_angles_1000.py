@@ -25,7 +25,8 @@ def normalised_cos_squared(x):
 
 
 #Angular Distribution
-plt.hist(angles, label=f'Simulated muon angles', bins=25, density=True)
+angle_bin = 32 #square root of 1000
+plt.hist(angles, label=f'Simulated muon angles', bins=angle_bin, density=True)
 plt.plot(radians, normalised_cos_squared(radians), label='Normalised cos squared graph')
 plt.title(f'Density Histogram of Generated Zenith Angles for {muon_number} Simulated Muons')
 plt.ylabel('Frequency')
@@ -34,7 +35,8 @@ plt.legend()
 plt.show()
 
 #Energy Distribution
-plt.hist(energies, label=f'Simulated muon energies. Mean energy: {mean_energy/1000:.2f} GeV', bins=500)
+energy_bin = 1000
+plt.hist(energies, label=f'Simulated muon energies. Mean energy: {mean_energy/1000:.2f} GeV', bins=energy_bin)
 plt.title(f'Histogram of Generated Energies for {muon_number} Simulated Muons')
 plt.ylabel('Frequency')
 plt.xlabel('Energy / MeV')

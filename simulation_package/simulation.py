@@ -12,9 +12,9 @@ import simulation_package.graphing_functions as graphing_functions
 current_directory = os.getcwd()
 
 if __name__ == '__main__':
-    print('Directly Accessing SImulation File')
+    print('Directly Accessing Simulation File')
 
-def run_simulation(plot:bool, tmax:int, sipms_per_scintillator:int, array_dimension:int, dead_time_sipms_ns:int, 
+def run_simulation(plot:bool, return_energy:bool, tmax:int, sipms_per_scintillator:int, array_dimension:int, dead_time_sipms_ns:int, 
                    atomic_no:float, mass_no:float, excitation_energy:float, rho:float, max_muon_energy:float, min_muon_energy:float=200.):
     """Runs the simulation and plots graphs showing detection events for each scintillator. Each simulation calculates the passage of a single muon through a 
     scintillating array.
@@ -24,6 +24,8 @@ def run_simulation(plot:bool, tmax:int, sipms_per_scintillator:int, array_dimens
             plot (boolean): If Plot=True, then the simulation will return plots of the muon trajectory through the scintillating array, as well as bar graphs showing
             number of pulses produced by the silicon photomultipliers (SIPMs) inside of the scintillating apparatus. A second SiPM graph is produced for SiPMs working 
             in AND configuration, i.e. returning TRUE if any two of the SiPMs fire simultaneously.
+
+            return_energy(boolean): If return_energy is true, then the simulation returns the muon energies
         
             tmax (integer): The maximum simulated time in units of 100ps. The simulation's finest degree of granularity is on this order, which was decided based on the 
             dimensions ofthe apparatus (100s of cm) and typical values of the muon trajectory.
@@ -70,6 +72,7 @@ def run_simulation(plot:bool, tmax:int, sipms_per_scintillator:int, array_dimens
 
     #Initialise muon
     muon1 = Muon(array_dimension, max_muon_energy, min_muon_energy)
+    initial_energy = muon1.energy
 
     in_matrix = False
     in_motion = False
@@ -143,7 +146,7 @@ def run_simulation(plot:bool, tmax:int, sipms_per_scintillator:int, array_dimens
 
                     beta = muon1.get_beta()
 
-                    #Incremental distance in cm. If the speed is c, the distance travelled is 3cm
+                    #Incremental distance in cm. If the speed is c, the distance travelled is 3cm per timestep of 100ps
                     dx = 3 * beta
 
                     # 3: Calculate the energy loss due to the stopping power of the array.
@@ -227,12 +230,26 @@ def run_simulation(plot:bool, tmax:int, sipms_per_scintillator:int, array_dimens
         # graphing_functions.generate_OR_plot()
         graphing_functions.generate_AND_plot(array)
 
-    else:
+    elif return_energy:
         #RETURN VALUES OF THE SIMULATION:
         #Two values returned: the age (float) and whether the muon was stopped (boolean)
         #print(f'Age at end: {muon1.age}')
         print(f'Energy at end: {muon1.energy:.2f} MeV')
 
+        if muon1.decayed and in_motion:
+            #Muon decayed but wasn't stopped
+            return muon1.age, 0, initial_energy, muon1.energy
+        elif muon1.decayed and not in_motion:
+            #Muon decayed and was stopped
+            return muon1.age, 1, initial_energy, muon1.energy
+        elif not muon1.decayed and in_motion:
+            #Muon neither decayed nor stopped
+            return 0, 0, initial_energy, muon1.energy
+        else:
+            #Muon stopped but not decayed
+            return 0, 1, initial_energy, muon1.energy
+
+    else:
         if muon1.decayed and in_motion:
             #Muon decayed but wasn't stopped
             return muon1.age, 0

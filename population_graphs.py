@@ -14,7 +14,7 @@ import simulation_package.lifetime_processing as life
 """
 
 #Number of muons per run of simulation. Each simulation generates muons up to and including a certain energy value.
-muon_number = 1000
+muon_number = 100
 #Max time step in each iteration of the simulation
 tmax = 100000 #Time in 100s of picoseconds. 44000 * 100 picoseconds = 4.4 microseconds
 tmax_in_microseconds = ((tmax*100) * 10 **-12) / (1 * 10**-6) #Converting explicitly to microseconds
@@ -25,15 +25,15 @@ sipms_per_scintillator = 2
 #Using knowledge of the properties of the scintillator material
 atomic_no = 64
 mass_no = 118.17
-excitation_energy = 3 #In eV, based on light of wavelength 425nm
+excitation_energy = 64.7 #In eV
 rho = 1.081 #density in g/cm^3
 
 plot = False #Don't want to plot
 dead_time_sipms_ns = 10 #Dead time of the SiPMs in nanoseconds
 
 #ENERGY RANGES
-min_energies =  np.arange(110, 290, 10) #Minimum energies for the energy distribution in MeV
-max_energies = np.add(10, min_energies) #Maximum energies for the distribution in units of MeV. Muons are generated with energies between rest mass and this value
+min_energies =  np.arange(110, 610, 20) #Minimum energies for the energy distribution in MeV
+max_energies = np.add(20, min_energies) #Maximum energies for the distribution in units of MeV. Muons are generated with energies between rest mass and this value
 
 #Maximum lifetimes for each of the different simulation runs.
 init_pops = [] 
@@ -95,10 +95,10 @@ for j, max_e in enumerate(max_energies):
 
     if len(ages) > 0:
         ages_dataframe = pd.DataFrame({'ages in 100ps':ages})
-        ages_dataframe.to_csv(f'C:\\Users\\hayde\\Desktop\\Muon Scintillator\\stop_and_pop_data\\ages\\{min_e}_{max_e}MeV_ages.csv', index=False)
+        ages_dataframe.to_csv(f'C:\\Users\\hayde\\Desktop\\Muon Scintillator\\stop_and_pop_data_100\\ages\\{min_e}_{max_e}MeV_ages.csv', index=False)
     if len(stops) > 0:
         stops_dataframe = pd.DataFrame({'stops boolean':stops})
-        stops_dataframe.to_csv(f'C:\\Users\\hayde\\Desktop\\Muon Scintillator\\stop_and_pop_data\\stops\\{min_e}_{max_e}MeV_stops.csv', index=False)
+        stops_dataframe.to_csv(f'C:\\Users\\hayde\\Desktop\\Muon Scintillator\\stop_and_pop_data_100\\stops\\{min_e}_{max_e}MeV_stops.csv', index=False)
 
 print(f'Each simulation ran for {tmax_in_microseconds} simulated microseconds')
 
