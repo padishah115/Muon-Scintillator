@@ -36,9 +36,10 @@ plt.show()
 
 #Energy Distribution
 energy_bin = 1000
-plt.hist(energies, label=f'Simulated muon energies. Mean energy: {mean_energy/1000:.2f} GeV', bins=energy_bin)
-plt.title(f'Histogram of Generated Energies for {muon_number} Simulated Muons')
+plt.hist(energies, label=f'Simulated muon energies.', bins=energy_bin)
+plt.title(f'Histogram of Generated Energies for {muon_number} Simulated Muons. \n Mean energy: {mean_energy/1000:.2f} GeV')
 plt.ylabel('Frequency')
 plt.xlabel('Energy / MeV')
+plt.xscale('log')
 plt.legend()
 plt.show()

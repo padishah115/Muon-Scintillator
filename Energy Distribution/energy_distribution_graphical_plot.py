@@ -44,7 +44,7 @@ energy_dist = Energy_Distribution(0.110, 300)
 energy_dist.plot_distribution()
 
 
-e_min = 0.105266
+e_min = 0.105658
 
 e_maxes = [i for i in x]
 

@@ -1,6 +1,6 @@
 import numpy as np
 
-mean_efficiency = 0.55 #Modal/median/mean photon detection efficiency of the SiPMs
+mean_efficiency = 0.99 #Modal/median/mean photon detection efficiency of the SiPMs
 sigma_eff = 0.05 #Standard deviation of the efficiencies of the SiPMs
 
 
@@ -176,7 +176,7 @@ class SIPM:
         self.flash_times = []
         
         
-        self.dead_time = (dead_time_ns * 10**-9) / (100*10**-12)
+        self.dead_time = (dead_time_ns * 10**-9) / (100*10**-12) #Converts dead time in ns to dead time in 100s of ps
         self.last_flashed_time = 0
 
     
@@ -192,11 +192,7 @@ class SIPM:
     def caught_light(self, t):
         """Checks to see whether the SiPM catches the light of the scintillator."""
         chance = np.random.random()
-        if self.last_flashed_time == 0:
-             #First flash
-             self.last_flashed_time = t+1e-5 #Prevents edge case of flash occuring at t = 0 and then last_flashed time being set to 0
-             return True
-        if chance < self.efficiency and t - self.last_flashed_time > self.dead_time and self.last_flashed_time !=0:
+        if chance <= self.efficiency and t - self.last_flashed_time > self.dead_time:
              #Not the first flash
              self.last_flashed_time = t
              return True

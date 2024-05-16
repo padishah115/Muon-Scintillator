@@ -63,8 +63,6 @@ def run_simulation(plot:bool, return_energy:bool, tmax:int, sipms_per_scintillat
 
         """
 
-    tmax_in_microseconds = ((tmax*100) * 10 **-12) / (1 * 10**-6)
-
     t = 0
 
     #Initialise array
@@ -223,12 +221,12 @@ def run_simulation(plot:bool, return_energy:bool, tmax:int, sipms_per_scintillat
         print(f'Final position: {muon1.final_position}')
         print(f'Time muon spent in array: {(muon1.time_in_array + 1)*100}ps')
         graphing_functions.generate_scintillator_graphs(array, muon1)
-        graphing_functions.generate_muon_graph(muon1, muon1.initial_poisiton, muon1.final_position)
+        #graphing_functions.generate_muon_graph(muon1, muon1.initial_poisiton, muon1.final_position)
         graphing_functions.generate_muon_graph_with_scintillators(muon1, muon1.initial_poisiton, muon1.final_position)
 
         #Produce graphs of the scintillator hits with different logic.
         # graphing_functions.generate_OR_plot()
-        graphing_functions.generate_AND_plot(array)
+        #graphing_functions.generate_AND_plot(array)
 
     elif return_energy:
         #RETURN VALUES OF THE SIMULATION:
